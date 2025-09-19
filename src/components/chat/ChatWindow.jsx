@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { encryptMessage, decryptMessage } from "../../../utils/crypto.js";
+import {
+  encryptMessage,
+  decryptMessage,
+  importKey,
+  deriveSharedSecret,
+  normalizeEcPublicJwk,
+} from "../../../utils/crypto.js";
 import { uploadChatFile, deleteChat } from "../../../utils/api.js";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
@@ -439,6 +445,11 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
                   message={m}
                   currentUser={currentUser}
                   chatKey={activeChat.key}
+                  friendPublicKey={activeChat.friend.publicKey}
+                  myPrivateKeyStr={
+                    currentUser?.__privateKey ||
+                    localStorage.getItem(`privateKey_${currentUser.username}`)
+                  }
                   mine={mine}
                   prevSameSender={prevSameSender}
                   nextSameSender={nextSameSender}
@@ -560,6 +571,8 @@ const Message = ({
   message,
   currentUser,
   chatKey,
+  friendPublicKey,
+  myPrivateKeyStr,
   mine,
   prevSameSender,
   nextSameSender,
@@ -573,13 +586,22 @@ const Message = ({
 
   useEffect(() => {
     const decrypt = async () => {
+      if (!message?.content) return;
+      const enc = (() => {
+        try {
+          return JSON.parse(message.content);
+        } catch {
+          return null;
+        }
+      })();
+      if (!enc) {
+        setDecryptedContent("⚠️ Error decrypting message");
+        return;
+      }
+      // First attempt with provided chatKey
       if (chatKey) {
         try {
-          // Message content from server is a JSON string, so parse it first
-          const content = await decryptMessage(
-            JSON.parse(message.content),
-            chatKey
-          );
+          const content = await decryptMessage(enc, chatKey);
           setDecryptedContent(content);
           try {
             const parsed = JSON.parse(content);
@@ -587,13 +609,31 @@ const Message = ({
           } catch (_) {
             setContentObj(null);
           }
-        } catch (e) {
-          setDecryptedContent("⚠️ Error decrypting message");
+          return;
+        } catch {}
+      }
+      // Fallback: re-derive key on the fly using my private key and friend's public key
+      try {
+        if (!myPrivateKeyStr || !friendPublicKey) throw new Error("missing keys");
+        const myPriv = await importKey(myPrivateKeyStr, true);
+        const normalized = normalizeEcPublicJwk(friendPublicKey);
+        const theirPub = await importKey(normalized, false);
+        const derived = await deriveSharedSecret(myPriv, theirPub);
+        const content = await decryptMessage(enc, derived);
+        setDecryptedContent(content);
+        try {
+          const parsed = JSON.parse(content);
+          setContentObj(parsed && typeof parsed === "object" ? parsed : null);
+        } catch (_) {
+          setContentObj(null);
         }
+      } catch (e) {
+        setDecryptedContent("⚠️ Could not decrypt message.");
       }
     };
     decrypt();
-  }, [message.content, chatKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.content, chatKey, myPrivateKeyStr, friendPublicKey]);
 
   return (
     <div
