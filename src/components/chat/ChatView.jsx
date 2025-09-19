@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import io from "socket.io-client";
 import { apiRequest, SOCKET_URL } from "../../../utils/api";
-import {
-  importKey,
-  deriveSharedSecret,
-  normalizeEcPublicJwk,
-} from "../../../utils/crypto";
 
 import Sidebar from "./Sidebar";
 import ChatWindow from "./ChatWindow";
@@ -13,7 +8,7 @@ import AddFriendModal from "./AddFriendModal";
 import FriendRequestsModal from "./FriendRequestsModal";
 import SettingsModal from "./SettingsModal";
 import AnimateIn from "../motion/AnimateIn";
-import UnlockKeyModal from "./UnlockKeyModal";
+// Encryption removed: UnlockKeyModal no longer used
 
 const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [socket, setSocket] = useState(null);
@@ -21,13 +16,12 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [unreads, setUnreads] = useState({}); // friendId -> count
   const [friendRequests, setFriendRequests] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
-  const [chatKeys, setChatKeys] = useState({});
+  // Encryption removed: no shared chat keys
   const [chatMap, setChatMap] = useState({}); // chatId -> friendId
   const [isAddFriendModalOpen, setAddFriendModalOpen] = useState(false);
   const [isRequestsModalOpen, setRequestsModalOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
-  const [showUnlock, setShowUnlock] = useState(false);
-  const [isWarmupDone, setIsWarmupDone] = useState(false);
+  // Encryption removed: no unlock/warmup
   const [openBusy, setOpenBusy] = useState({}); // friendId -> bool
   // Refs to avoid effect re-subscription storms
   const activeChatRef = useRef(null);
@@ -69,12 +63,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
     }
   }, [currentUser.token, onAlert]);
 
-  // Prompt to unlock private key if missing in memory but available encrypted on account
-  useEffect(() => {
-    if (!currentUser?.__privateKey && currentUser?.encryptedPrivateKey) {
-      setShowUnlock(true);
-    }
-  }, [currentUser?.__privateKey, currentUser?.encryptedPrivateKey]);
+  // Encryption removed: no private key unlock prompt
   // Socket setup with websocket-first and fallback
   useEffect(() => {
     retriedTransportRef.current = false;
@@ -213,43 +202,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
     chatMapRef.current = chatMap;
   }, [chatMap]);
 
-  useEffect(() => {
-    (async () => {
-      if (!friends?.length || isWarmupDone) return;
-      try {
-        const privStr =
-          currentUser?.__privateKey ||
-          localStorage.getItem(`privateKey_${currentUser.username}`);
-        if (!privStr) return;
-        const myPrivateKey = await importKey(privStr, true);
-        const entries = await Promise.all(
-          friends.map(async (f) => {
-            try {
-              const normalizedJwk = normalizeEcPublicJwk(f.publicKey);
-              const otherPublicKey = await importKey(normalizedJwk);
-              const key = await deriveSharedSecret(
-                myPrivateKey,
-                otherPublicKey
-              );
-              return [f._id, key];
-            } catch {
-              return null;
-            }
-          })
-        );
-        const precomputed = entries.reduce((acc, pair) => {
-          if (pair) acc[pair[0]] = pair[1];
-          return acc;
-        }, {});
-        if (Object.keys(precomputed).length) {
-          setChatKeys((prev) => ({ ...prev, ...precomputed }));
-        }
-        setIsWarmupDone(true);
-      } catch {
-        // ignore warmup errors
-      }
-    })();
-  }, [friends, currentUser.username, isWarmupDone]);
+  // Encryption removed: no shared key warmup
 
   const handleSelectFriend = async (friend) => {
     if (friend?.__openSettings) {
@@ -281,32 +234,14 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         );
       } catch {}
       setUnreads((prev) => ({ ...prev, [friend._id]: 0 }));
-      let sharedKey = chatKeys[friend._id];
-      if (!sharedKey) {
-        const privStr =
-          currentUser?.__privateKey ||
-          localStorage.getItem(`privateKey_${currentUser.username}`);
-        if (!privStr) {
-          throw new Error("Missing private key");
-        }
-        const myPrivateKey = await importKey(privStr, true);
-        const normalizedJwk = normalizeEcPublicJwk(friend.publicKey);
-        const otherPublicKey = await importKey(normalizedJwk);
-        sharedKey = await deriveSharedSecret(myPrivateKey, otherPublicKey);
-        setChatKeys((prev) => ({ ...prev, [friend._id]: sharedKey }));
-      }
-      setActiveChat({ ...chat, friend, messages, key: sharedKey });
+      // No shared key; use plaintext
+      setActiveChat({ ...chat, friend, messages });
       // Ensure socket joins this chat's room to receive real-time messages
       try {
         socket?.emit("joinChat", { chatId: chat._id });
       } catch {}
     } catch (error) {
-      const msg = /Cannot create a key using the specified key usages/i.test(
-        error?.message || ""
-      )
-        ? "Encryption setup failed. Please log out, log back in, and try again."
-        : error.message;
-      onAlert(msg, "error");
+      onAlert(error.message, "error");
     } finally {
       setOpenBusy((m) => ({ ...m, [friend._id]: false }));
     }
@@ -334,7 +269,6 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             currentUser={currentUser}
             socket={socket}
             activeChat={activeChat}
-            onRequireUnlock={() => setShowUnlock(true)}
             onBack={() => setActiveChat(null)}
           />
         )}
@@ -428,17 +362,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
           }}
         />
       )}
-      {showUnlock && (
-        <UnlockKeyModal
-          currentUser={currentUser}
-          onClose={() => setShowUnlock(false)}
-          onAlert={onAlert}
-          onUnlocked={(updated) => {
-            onCurrentUserUpdated?.(updated);
-            setShowUnlock(false);
-          }}
-        />
-      )}
+      {/* Encryption removed: unlock modal no longer shown */}
     </div>
   );
 };

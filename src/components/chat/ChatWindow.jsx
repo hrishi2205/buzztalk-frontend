@@ -1,11 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  encryptMessage,
-  decryptMessage,
-  importKey,
-  deriveSharedSecret,
-  normalizeEcPublicJwk,
-} from "../../../utils/crypto.js";
 import { uploadChatFile, deleteChat } from "../../../utils/api.js";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
@@ -147,11 +140,10 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   // Handle sending a new message
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeChat.key) return;
+    if (!newMessage.trim()) return;
 
-    // Encrypt the message content before sending
-    const encryptedContent = await encryptMessage(newMessage, activeChat.key);
-    const payload = JSON.stringify(encryptedContent);
+    // Send plaintext content
+    const payload = newMessage;
     const optimisticId = `optimistic-${Date.now()}`;
     const optimisticMsg = {
       _id: optimisticId,
@@ -166,10 +158,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     setMessages((prev) => [...prev, optimisticMsg]);
 
     // Emit the 'sendMessage' event to the server
-    socket.emit("sendMessage", {
-      chatId: activeChat._id,
-      content: payload,
-    });
+    socket.emit("sendMessage", { chatId: activeChat._id, content: payload });
 
     // Reset input and clear typing indicator
     setNewMessage("");
@@ -189,10 +178,10 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     fileInputRef.current?.click();
   };
 
-  // Handle selected file: upload, create encrypted attachment message, send
+  // Handle selected file: upload, create attachment message (plaintext JSON), send
   const handleAttachFile = async (e) => {
     const file = e.target.files?.[0];
-    if (!file || !activeChat?.key) return;
+    if (!file) return;
 
     // Reset the input so selecting same file again re-triggers change
     e.target.value = "";
@@ -209,11 +198,8 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
         size: meta.size || file.size,
       };
 
-      const encryptedContent = await encryptMessage(
-        JSON.stringify(attachment),
-        activeChat.key
-      );
-      const payload = JSON.stringify(encryptedContent);
+      // Send attachment as JSON string payload (no encryption)
+      const payload = JSON.stringify(attachment);
 
       const optimisticId = `optimistic-${Date.now()}`;
       const optimisticMsg = {
@@ -228,10 +214,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
 
       setMessages((prev) => [...prev, optimisticMsg]);
 
-      socket.emit("sendMessage", {
-        chatId: activeChat._id,
-        content: payload,
-      });
+      socket.emit("sendMessage", { chatId: activeChat._id, content: payload });
     } catch (err) {
       console.error("Attachment send failed:", err);
       // Optionally show a toast here if a toast system exists
@@ -445,12 +428,6 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
                   key={m._id}
                   message={m}
                   currentUser={currentUser}
-                  chatKey={activeChat.key}
-                  friendPublicKey={activeChat.friend.publicKey}
-                  myPrivateKeyStr={
-                    currentUser?.__privateKey ||
-                    localStorage.getItem(`privateKey_${currentUser.username}`)
-                  }
                   mine={mine}
                   prevSameSender={prevSameSender}
                   nextSameSender={nextSameSender}
@@ -567,13 +544,10 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   );
 };
 
-// A sub-component responsible for rendering and decrypting a single message
+// A sub-component responsible for rendering a single message (plaintext or attachment JSON)
 const Message = ({
   message,
   currentUser,
-  chatKey,
-  friendPublicKey,
-  myPrivateKeyStr,
   mine,
   prevSameSender,
   nextSameSender,
@@ -582,60 +556,36 @@ const Message = ({
   lastReadAtByOther,
   onToggleReaction,
 }) => {
-  const [decryptedContent, setDecryptedContent] = useState("Decrypting...");
+  const [displayContent, setDisplayContent] = useState("");
   const [contentObj, setContentObj] = useState(null);
 
   useEffect(() => {
-    const decrypt = async () => {
-      if (!message?.content) return;
-      const enc = (() => {
-        try {
-          return JSON.parse(message.content);
-        } catch {
-          return null;
-        }
-      })();
-      if (!enc) {
-        setDecryptedContent("⚠️ Error decrypting message");
-        return;
+    const content = message?.content || "";
+    // Try to parse as JSON for attachment support
+    try {
+      const parsed = JSON.parse(content);
+      if (parsed && typeof parsed === "object" && parsed.type === "attachment") {
+        setContentObj(parsed);
+        setDisplayContent("");
+      } else if (
+        parsed &&
+        typeof parsed === "object" &&
+        Array.isArray(parsed.iv) &&
+        Array.isArray(parsed.ciphertext)
+      ) {
+        // Legacy encrypted message – cannot decrypt after removing E2EE
+        setContentObj(null);
+        setDisplayContent("🔒 Encrypted (legacy message)");
+      } else {
+        setContentObj(null);
+        setDisplayContent(content);
       }
-      // First attempt with provided chatKey
-      if (chatKey) {
-        try {
-          const content = await decryptMessage(enc, chatKey);
-          setDecryptedContent(content);
-          try {
-            const parsed = JSON.parse(content);
-            setContentObj(parsed && typeof parsed === "object" ? parsed : null);
-          } catch (_) {
-            setContentObj(null);
-          }
-          return;
-        } catch {}
-      }
-      // Fallback: re-derive key on the fly using my private key and friend's public key
-      try {
-        if (!myPrivateKeyStr || !friendPublicKey)
-          throw new Error("missing keys");
-        const myPriv = await importKey(myPrivateKeyStr, true);
-        const normalized = normalizeEcPublicJwk(friendPublicKey);
-        const theirPub = await importKey(normalized, false);
-        const derived = await deriveSharedSecret(myPriv, theirPub);
-        const content = await decryptMessage(enc, derived);
-        setDecryptedContent(content);
-        try {
-          const parsed = JSON.parse(content);
-          setContentObj(parsed && typeof parsed === "object" ? parsed : null);
-        } catch (_) {
-          setContentObj(null);
-        }
-      } catch (e) {
-        setDecryptedContent("⚠️ Could not decrypt message.");
-      }
-    };
-    decrypt();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message.content, chatKey, myPrivateKeyStr, friendPublicKey]);
+    } catch {
+      // Plain text
+      setContentObj(null);
+      setDisplayContent(content);
+    }
+  }, [message?.content]);
 
   return (
     <div
@@ -676,7 +626,7 @@ const Message = ({
           {contentObj && contentObj.type === "attachment" ? (
             <AttachmentPreview attachment={contentObj} />
           ) : (
-            decryptedContent
+            displayContent
           )}
         </div>
         {/* Reactions row */}
