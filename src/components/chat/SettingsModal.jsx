@@ -46,13 +46,13 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-      <div className="w-full max-w-md mx-4 rounded-2xl bg-white/90 backdrop-blur-md border border-amber-200 shadow-xl">
-        <div className="p-4 border-b border-amber-200 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-amber-700">Settings</h3>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30">
+      <div className="w-full sm:max-w-md mx-0 sm:mx-4 rounded-t-2xl sm:rounded-2xl bg-white/85 backdrop-blur-md border border-amber-200 shadow-2xl">
+        <div className="p-4 border-b border-amber-200 flex items-center justify-between bg-gradient-to-r from-amber-100 to-amber-200 rounded-t-2xl">
+          <h3 className="text-base sm:text-lg font-bold text-amber-800">Settings</h3>
           <button
             onClick={onClose}
-            className="px-3 py-1 rounded-lg bg-amber-100 text-amber-700 border border-amber-200"
+            className="px-3 py-1 rounded-lg bg-white/70 text-amber-700 border border-amber-200 hover:bg-white active:scale-95"
           >
             Close
           </button>
@@ -102,21 +102,21 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-slate-200 text-slate-800"
+              className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white"
+              className="px-4 py-2 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white shadow-sm active:scale-95"
             >
               {saving ? "Saving..." : "Save"}
             </button>
           </div>
         </form>
         <div className="px-4 pb-4">
-          <div className="mt-3 p-3 border border-red-200 rounded-xl bg-red-50">
+          <div className="mt-3 p-3 border border-red-200 rounded-xl bg-red-50/80">
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-semibold text-red-700">Danger zone</div>
@@ -126,7 +126,7 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
               </div>
               <button
                 onClick={() => setShowDelete((v) => !v)}
-                className="px-3 py-1 rounded-lg bg-red-600 text-white"
+                className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm active:scale-95"
               >
                 Delete Account
               </button>
@@ -148,7 +148,7 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
                   <button
                     type="button"
                     onClick={() => setShowDelete(false)}
-                    className="px-3 py-1 rounded-lg bg-slate-200 text-slate-800"
+                    className="px-3 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800"
                   >
                     Cancel
                   </button>
@@ -178,7 +178,7 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
                         setDeleting(false);
                       }
                     }}
-                    className="px-3 py-1 rounded-lg bg-red-600 text-white"
+                    className="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white shadow-sm active:scale-95 disabled:opacity-60"
                   >
                     {deleting ? "Deleting..." : "Confirm Delete"}
                   </button>

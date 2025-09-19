@@ -42,7 +42,7 @@ const Sidebar = ({
           {/* All Friends Button */}
           <button
             onClick={onShowAllFriends}
-            className="p-2 bg-white/70 border border-amber-200 text-amber-700 rounded-full hover:bg-amber-50 active:scale-95"
+            className="p-2 sm:p-2.5 bg-white/80 border border-amber-200 text-amber-700 rounded-full hover:bg-white shadow-sm active:scale-95"
             title="All Friends"
           >
             <svg
@@ -62,7 +62,7 @@ const Sidebar = ({
           {/* Settings Button */}
           <button
             onClick={onOpenSettings}
-            className="p-2 bg-white/70 border border-amber-200 text-amber-700 rounded-full hover:bg-amber-50 active:scale-95"
+            className="p-2 sm:p-2.5 bg-white/80 border border-amber-200 text-amber-700 rounded-full hover:bg-white shadow-sm active:scale-95"
             title="Settings"
           >
             <svg

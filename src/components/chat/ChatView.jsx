@@ -10,34 +10,45 @@ import SettingsModal from "./SettingsModal";
 import AnimateIn from "../motion/AnimateIn";
 // Encryption removed: UnlockKeyModal no longer used
 
-// Simple All Friends modal
+// Polished All Friends modal with mobile bottom-sheet style
 const AllFriendsModal = ({ open, friends, onClose }) => {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-lg">All Friends</h3>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40">
+      <div className="w-full sm:max-w-md sm:mx-4 bg-white/80 backdrop-blur-md border border-amber-200 rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[92vh] sm:max-h-[80vh] overflow-hidden">
+        <div className="relative p-4 border-b border-amber-200 bg-gradient-to-r from-amber-100 to-amber-200">
+          <h3 className="text-base sm:text-lg font-bold text-amber-800">All Friends</h3>
           <button
-            className="px-2 py-1 text-slate-600 hover:bg-slate-100 rounded"
+            className="absolute right-3 top-3 px-3 py-1 rounded-lg bg-white/70 text-amber-700 border border-amber-200 hover:bg-white active:scale-95"
             onClick={onClose}
+            aria-label="Close"
           >
             Close
           </button>
         </div>
-        <div className="max-h-96 overflow-y-auto divide-y">
+        <div className="p-2 sm:p-3 overflow-y-auto divide-y divide-amber-100 max-h-[calc(92vh-64px)] sm:max-h-[calc(80vh-64px)]">
           {friends?.length ? (
             friends.map((f) => (
-              <div key={f._id} className="flex items-center gap-3 py-2">
-                <img
-                  src={
-                    f.avatarUrl || `https://i.pravatar.cc/40?u=${f.username}`
-                  }
-                  alt={f.displayName || f.username}
-                  className="w-8 h-8 rounded-full"
-                />
+              <div
+                key={f._id}
+                className="flex items-center gap-3 py-3 px-2 hover:bg-amber-50/60 transition-colors rounded-xl"
+              >
+                <div className="relative shrink-0">
+                  <img
+                    src={
+                      f.avatarUrl || `https://i.pravatar.cc/40?u=${f.username}`
+                    }
+                    alt={f.displayName || f.username}
+                    className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm"
+                  />
+                  <span
+                    className={`absolute bottom-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white ${
+                      f.status === "online" ? "bg-green-500" : "bg-slate-400"
+                    }`}
+                  />
+                </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-slate-800 truncate">
+                  <div className="font-semibold text-slate-900 truncate">
                     {f.displayName || f.username}
                   </div>
                   <div className="text-[11px] text-slate-500 truncate">
@@ -47,7 +58,7 @@ const AllFriendsModal = ({ open, friends, onClose }) => {
               </div>
             ))
           ) : (
-            <div className="text-slate-600 text-sm">No friends yet.</div>
+            <div className="text-slate-600 text-sm p-3">No friends yet.</div>
           )}
         </div>
       </div>
