@@ -198,7 +198,8 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     e.target.value = "";
 
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || currentUser?.token || undefined;
       const meta = await uploadChatFile(file, token);
       const attachment = {
         type: "attachment",
@@ -614,7 +615,8 @@ const Message = ({
       }
       // Fallback: re-derive key on the fly using my private key and friend's public key
       try {
-        if (!myPrivateKeyStr || !friendPublicKey) throw new Error("missing keys");
+        if (!myPrivateKeyStr || !friendPublicKey)
+          throw new Error("missing keys");
         const myPriv = await importKey(myPrivateKeyStr, true);
         const normalized = normalizeEcPublicJwk(friendPublicKey);
         const theirPub = await importKey(normalized, false);

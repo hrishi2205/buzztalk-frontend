@@ -334,6 +334,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             currentUser={currentUser}
             socket={socket}
             activeChat={activeChat}
+            onRequireUnlock={() => setShowUnlock(true)}
             onBack={() => setActiveChat(null)}
           />
         )}
