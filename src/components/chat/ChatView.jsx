@@ -350,7 +350,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         </div>
         <div className="flex-1 min-w-0 flex">
           {activeChat ? (
-            <AnimateIn type="up" duration={0.35} className="flex-1 min-w-0 flex">
+            <AnimateIn
+              type="up"
+              duration={0.35}
+              className="flex-1 min-w-0 flex"
+            >
               <ChatWindow
                 currentUser={currentUser}
                 socket={socket}
