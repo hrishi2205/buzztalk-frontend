@@ -6,6 +6,7 @@ import LoginView from "./components/auth/LoginView.jsx";
 import RegisterFlow from "./components/auth/RegisterFlow.jsx";
 import ChatView from "./components/chat/ChatView.jsx";
 import Alert from "./components/ui/Alert.jsx";
+import LoadingScreen from "./components/ui/LoadingScreen.jsx";
 
 function App() {
   // State to manage the current view ('landing', 'login', 'register', 'chat', or 'loading')
@@ -94,11 +95,7 @@ function App() {
   const renderView = () => {
     switch (view) {
       case "loading":
-        return (
-          <div className="h-screen w-screen flex items-center justify-center bg-slate-900 text-slate-200">
-            Loading...
-          </div>
-        );
+        return <LoadingScreen />;
       case "login":
         return (
           <LoginView setView={navigate} onLoginSuccess={handleLoginSuccess} />
