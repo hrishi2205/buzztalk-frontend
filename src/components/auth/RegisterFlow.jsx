@@ -231,7 +231,7 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
                   type="file"
                   accept="image/*"
                   onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                  className="flex-1 text-sm"
+                  className="cursor-pointer inline-block px-4 py-2 bg-amber-500 text-white font-semibold text-sm rounded-md shadow-sm hover:bg-amber-600 transition-colors"
                 />
               </div>
               <p className="text-xs text-slate-500 mt-1">

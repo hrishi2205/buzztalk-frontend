@@ -13,7 +13,7 @@ const LandingView = ({ setView }) => {
       <div className="pointer-events-none absolute bottom-10 -right-10 w-72 h-72 bg-amber-400/30 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] blur-2xl" />
 
       {/* Navbar */}
-  <header className="flex justify-between items-center px-4 py-4 md:px-8 md:py-5">
+      <header className="flex justify-between items-center px-4 py-4 md:px-8 md:py-5">
         <h1 className="text-2xl font-extrabold text-amber-700 flex items-center gap-2 drop-shadow-sm">
           <Hexagon className="w-7 h-7 text-amber-600" /> BuzzTalk
         </h1>
