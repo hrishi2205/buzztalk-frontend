@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { encryptMessage, decryptMessage } from "../../../utils/crypto.js";
+import { uploadChatFile } from "../../../utils/api.js";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   const [messages, setMessages] = useState([]);
@@ -9,6 +10,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   const messagesEndRef = useRef(null);
   let typingTimeout = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Helpers: date formatting and grouping
   const isSameDay = (a, b) => {
@@ -101,11 +103,19 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       setTypingUsers((prev) => prev.filter((id) => id !== userId));
     };
 
+    // Reactions: update message reactions in-place
+    const handleMessageReaction = ({ messageId, reactions }) => {
+      setMessages((prev) =>
+        prev.map((m) => (m._id === messageId ? { ...m, reactions } : m))
+      );
+    };
+
     // Register listeners
     socket.on("newMessage", handleNewMessage);
     socket.on("messagesRead", handleMessagesRead);
     socket.on("userTyping", handleUserTyping);
     socket.on("userStoppedTyping", handleUserStoppedTyping);
+    socket.on("messageReaction", handleMessageReaction);
 
     // Cleanup: remove listeners when component unmounts or socket changes
     return () => {
@@ -113,6 +123,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       socket.off("messagesRead", handleMessagesRead);
       socket.off("userTyping", handleUserTyping);
       socket.off("userStoppedTyping", handleUserStoppedTyping);
+      socket.off("messageReaction", handleMessageReaction);
     };
   }, [socket, activeChat._id, typingUsers]);
 
@@ -147,6 +158,72 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     setNewMessage("");
     socket.emit("stopTyping", { chatId: activeChat._id });
     if (typingTimeout.current) clearTimeout(typingTimeout.current);
+  };
+
+  // Insert a simple emoji at cursor/end
+  const handleInsertEmoji = () => {
+    const emoji = "😊";
+    setNewMessage((prev) => prev + emoji);
+    inputRef.current?.focus();
+  };
+
+  // Trigger file picker
+  const handleAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // Handle selected file: upload, create encrypted attachment message, send
+  const handleAttachFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeChat?.key) return;
+
+    // Reset the input so selecting same file again re-triggers change
+    e.target.value = "";
+
+    try {
+      const token = localStorage.getItem("token");
+      const meta = await uploadChatFile(file, token);
+      const attachment = {
+        type: "attachment",
+        url: meta.url,
+        filename: meta.filename || file.name,
+        mimetype: meta.mimetype || file.type,
+        size: meta.size || file.size,
+      };
+
+      const encryptedContent = await encryptMessage(
+        JSON.stringify(attachment),
+        activeChat.key
+      );
+      const payload = JSON.stringify(encryptedContent);
+
+      const optimisticId = `optimistic-${Date.now()}`;
+      const optimisticMsg = {
+        _id: optimisticId,
+        chatId: activeChat._id,
+        senderId: { _id: currentUser._id, username: currentUser.username },
+        content: payload,
+        createdAt: new Date().toISOString(),
+        optimistic: true,
+        reactions: [],
+      };
+
+      setMessages((prev) => [...prev, optimisticMsg]);
+
+      socket.emit("sendMessage", {
+        chatId: activeChat._id,
+        content: payload,
+      });
+    } catch (err) {
+      console.error("Attachment send failed:", err);
+      // Optionally show a toast here if a toast system exists
+    }
+  };
+
+  // Toggle a reaction on a message
+  const handleToggleReaction = (messageId, emoji) => {
+    if (!socket) return;
+    socket.emit("reactMessage", { messageId, emoji });
   };
 
   // Handle the typing indicator logic
@@ -272,7 +349,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       </div>
 
       {/* Messages Container */}
-  <div className="flex-1 p-4 md:p-6 space-y-4 overflow-y-auto bg-white/30">
+      <div className="flex-1 p-4 md:p-6 space-y-4 overflow-y-auto bg-white/30">
         {groups.map((group) => (
           <div key={group.label}>
             {/* Day separator */}
@@ -282,20 +359,23 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
               </span>
             </div>
             {/* Messages in this day */}
-            {group.items.map(({ m, mine, prevSameSender, nextSameSender, showAvatar }) => (
-              <Message
-                key={m._id}
-                message={m}
-                currentUser={currentUser}
-                chatKey={activeChat.key}
-                mine={mine}
-                prevSameSender={prevSameSender}
-                nextSameSender={nextSameSender}
-                showAvatar={showAvatar}
-                timeLabel={timeLabel(m.createdAt || Date.now())}
-                lastReadAtByOther={lastReadAtByOther}
-              />
-            ))}
+            {group.items.map(
+              ({ m, mine, prevSameSender, nextSameSender, showAvatar }) => (
+                <Message
+                  key={m._id}
+                  message={m}
+                  currentUser={currentUser}
+                  chatKey={activeChat.key}
+                  mine={mine}
+                  prevSameSender={prevSameSender}
+                  nextSameSender={nextSameSender}
+                  showAvatar={showAvatar}
+                  timeLabel={timeLabel(m.createdAt || Date.now())}
+                  lastReadAtByOther={lastReadAtByOther}
+                  onToggleReaction={handleToggleReaction}
+                />
+              )
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -315,9 +395,33 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       <div className="p-4 bg-white/40 backdrop-blur-md border-t border-amber-200">
         <form onSubmit={handleSendMessage} className="composer">
           {/* Attach */}
-          <button type="button" className="toolbar-btn" title="Attach">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12.79V7a2 2 0 00-2-2h-5.79a2 2 0 00-1.41.59L3 14.39a2 2 0 000 2.83l3.78 3.78a2 2 0 002.83 0l8.39-8.39a2 2 0 000-2.83l-3.17-3.17"/></svg>
+          <button
+            type="button"
+            className="toolbar-btn"
+            title="Attach"
+            onClick={handleAttachClick}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 12.79V7a2 2 0 00-2-2h-5.79a2 2 0 00-1.41.59L3 14.39a2 2 0 000 2.83l3.78 3.78a2 2 0 002.83 0l8.39-8.39a2 2 0 000-2.83l-3.17-3.17"
+              />
+            </svg>
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={handleAttachFile}
+          />
           {/* Textarea */}
           <textarea
             ref={inputRef}
@@ -330,12 +434,47 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             className="flex-1 bg-transparent outline-none resize-none text-slate-800 placeholder:text-slate-400 px-1 py-2"
           />
           {/* Emoji */}
-          <button type="button" className="toolbar-btn" title="Emoji">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M15 9h.01M9 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <button
+            type="button"
+            className="toolbar-btn"
+            title="Emoji"
+            onClick={handleInsertEmoji}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M14.828 14.828a4 4 0 01-5.656 0M15 9h.01M9 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
           </button>
           {/* Send */}
-          <button type="submit" className="toolbar-btn brand-gradient text-white" title="Send">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12l14-7-7 14-2-5-5-2z"/></svg>
+          <button
+            type="submit"
+            className="toolbar-btn brand-gradient text-white"
+            title="Send"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 12l14-7-7 14-2-5-5-2z"
+              />
+            </svg>
           </button>
         </form>
       </div>
@@ -354,8 +493,10 @@ const Message = ({
   showAvatar,
   timeLabel,
   lastReadAtByOther,
+  onToggleReaction,
 }) => {
   const [decryptedContent, setDecryptedContent] = useState("Decrypting...");
+  const [contentObj, setContentObj] = useState(null);
 
   useEffect(() => {
     const decrypt = async () => {
@@ -367,6 +508,12 @@ const Message = ({
             chatKey
           );
           setDecryptedContent(content);
+          try {
+            const parsed = JSON.parse(content);
+            setContentObj(parsed && typeof parsed === "object" ? parsed : null);
+          } catch (_) {
+            setContentObj(null);
+          }
         } catch (e) {
           setDecryptedContent("⚠️ Error decrypting message");
         }
@@ -376,7 +523,11 @@ const Message = ({
   }, [message.content, chatKey]);
 
   return (
-    <div className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"} mb-1 relative group`}>
+    <div
+      className={`flex items-end gap-2 ${
+        mine ? "justify-end" : "justify-start"
+      } mb-1 relative group`}
+    >
       {!mine && showAvatar && (
         <img
           src={
@@ -398,17 +549,75 @@ const Message = ({
             {message.senderId.displayName || message.senderId.username}
           </div>
         )}
-        <div className={`bubble ${mine ? "bubble-mine" : "bubble-other"} ${nextSameSender ? (mine ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-bl-md") : "rounded-2xl"}`}>
-          {decryptedContent}
+        <div
+          className={`bubble ${mine ? "bubble-mine" : "bubble-other"} ${
+            nextSameSender
+              ? mine
+                ? "rounded-2xl rounded-br-md"
+                : "rounded-2xl rounded-bl-md"
+              : "rounded-2xl"
+          }`}
+        >
+          {contentObj && contentObj.type === "attachment" ? (
+            <AttachmentPreview attachment={contentObj} />
+          ) : (
+            decryptedContent
+          )}
         </div>
+        {/* Reactions row */}
+        {Array.isArray(message.reactions) && message.reactions.length > 0 && (
+          <div className={`mt-1 flex gap-1 ${mine ? "justify-end" : ""}`}>
+            {Object.entries(
+              message.reactions.reduce((acc, r) => {
+                acc[r.emoji] = (acc[r.emoji] || 0) + 1;
+                return acc;
+              }, {})
+            ).map(([emoji, count]) => (
+              <button
+                key={emoji}
+                onClick={() => onToggleReaction?.(message._id, emoji)}
+                className="px-2 py-0.5 text-xs rounded-full bg-white/60 border border-amber-200 shadow-sm hover:bg-white/80 active:scale-95"
+                title="Toggle reaction"
+              >
+                <span className="mr-1">{emoji}</span>
+                <span className="text-slate-600">{count}</span>
+              </button>
+            ))}
+          </div>
+        )}
         {/* Hover toolbar */}
         <div className="toolbar-floating opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <button className="toolbar-btn" title="React">😄</button>
+          <button
+            className="toolbar-btn"
+            title="React"
+            onClick={() => onToggleReaction?.(message._id, "👍")}
+          >
+            😄
+          </button>
           <button className="toolbar-btn" title="Copy">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+            </svg>
           </button>
           <button className="toolbar-btn" title="More">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="19" cy="12" r="1" />
+              <circle cx="5" cy="12" r="1" />
+            </svg>
           </button>
         </div>
         {/* Timestamp (tiny, subtle) */}
@@ -431,3 +640,55 @@ const Message = ({
 };
 
 export default ChatWindow;
+
+// Lightweight attachment previewer
+const prettySize = (bytes) => {
+  if (bytes == null) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let i = 0;
+  let n = bytes;
+  while (n >= 1024 && i < units.length - 1) {
+    n /= 1024;
+    i++;
+  }
+  return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+};
+
+const AttachmentPreview = ({ attachment }) => {
+  const { url, filename, mimetype, size } = attachment || {};
+  const isImage = /^image\//i.test(mimetype || "");
+  return (
+    <div className="flex flex-col gap-1">
+      {isImage ? (
+        <a href={url} target="_blank" rel="noreferrer">
+          <img
+            src={url}
+            alt={filename || "image"}
+            className="max-h-64 max-w-full rounded-lg border border-amber-200/60 shadow-sm"
+            loading="lazy"
+          />
+        </a>
+      ) : (
+        <a
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/60 border border-amber-200 shadow-sm hover:bg-white/80"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <path d="M14 2v6h6" />
+          </svg>
+          <span className="text-sm text-slate-800">{filename || "file"}</span>
+          <span className="text-xs text-slate-500">{prettySize(size)}</span>
+        </a>
+      )}
+    </div>
+  );
+};

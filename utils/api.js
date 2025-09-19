@@ -119,3 +119,38 @@ export const uploadAvatarFile = async (file, token) => {
   }
   return data; // { url }
 };
+
+// Upload any chat file using multipart/form-data. Returns { url, filename, mimetype, size }
+export const uploadChatFile = async (file, token) => {
+  const url = `${API_URL}/api/upload/file`;
+  const form = new FormData();
+  form.append("file", file);
+  const headers = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  let response;
+  try {
+    response = await fetch(url, { method: "POST", body: form, headers });
+  } catch (e) {
+    throw new Error(`Network error uploading file: ${e.message}`);
+  }
+
+  let data;
+  const contentType = response.headers.get("content-type") || "";
+  try {
+    if (contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { message: text };
+    }
+  } catch (e) {
+    data = { message: "Invalid response from server" };
+  }
+
+  if (!response.ok) {
+    const msg = data?.message || `File upload failed (${response.status})`;
+    throw new Error(msg);
+  }
+  return data; // { url, filename, mimetype, size }
+};
