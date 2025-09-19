@@ -15,7 +15,7 @@ const Sidebar = ({
   const requestsCount = requests.length;
 
   return (
-    <div className="w-full bg-white/70 backdrop-blur-md flex flex-col border-r border-amber-200 md:rounded-l-2xl">
+    <div className="w-full glass flex flex-col md:rounded-l-2xl">
       {/* Header Section */}
       <div className="p-4 border-b border-amber-200 flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -125,10 +125,8 @@ const Sidebar = ({
             <div
               key={friend._id}
               onClick={() => onSelectFriend(friend)}
-              className={`p-4 border-b border-amber-100 hover:bg-amber-50/70 cursor-pointer flex items-center space-x-3 transition-colors ${
-                activeChat?.friend._id === friend._id
-                  ? "bg-amber-50/80"
-                  : "bg-white/0"
+              className={`p-4 border-b border-amber-100 cursor-pointer flex items-center space-x-3 transition-colors ${
+                activeChat?.friend._id === friend._id ? "bg-amber-50/70 gradient-sheen" : "hover:bg-amber-50/50"
               }`}
             >
               <div className="relative">

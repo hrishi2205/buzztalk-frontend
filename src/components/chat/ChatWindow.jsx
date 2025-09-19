@@ -210,9 +210,9 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   });
 
   return (
-    <div className="flex w-full flex-col bg-white/60 backdrop-blur-md border border-amber-200 md:rounded-r-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden">
+    <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
       {/* Chat Header */}
-      <div className="p-4 border-b border-amber-200 bg-white/70 backdrop-blur-md flex items-center gap-3">
+      <div className="p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3">
         {/* Mobile back button */}
         {onBack && (
           <button
@@ -272,7 +272,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 p-4 md:p-6 space-y-4 overflow-y-auto bg-white/40">
+  <div className="flex-1 p-4 md:p-6 space-y-4 overflow-y-auto bg-white/30">
         {groups.map((group) => (
           <div key={group.label}>
             {/* Day separator */}
@@ -282,22 +282,20 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
               </span>
             </div>
             {/* Messages in this day */}
-            {group.items.map(
-              ({ m, mine, prevSameSender, nextSameSender, showAvatar }) => (
-                <Message
-                  key={m._id}
-                  message={m}
-                  currentUser={currentUser}
-                  chatKey={activeChat.key}
-                  mine={mine}
-                  prevSameSender={prevSameSender}
-                  nextSameSender={nextSameSender}
-                  showAvatar={showAvatar}
-                  timeLabel={timeLabel(m.createdAt || Date.now())}
-                  lastReadAtByOther={lastReadAtByOther}
-                />
-              )
-            )}
+            {group.items.map(({ m, mine, prevSameSender, nextSameSender, showAvatar }) => (
+              <Message
+                key={m._id}
+                message={m}
+                currentUser={currentUser}
+                chatKey={activeChat.key}
+                mine={mine}
+                prevSameSender={prevSameSender}
+                nextSameSender={nextSameSender}
+                showAvatar={showAvatar}
+                timeLabel={timeLabel(m.createdAt || Date.now())}
+                lastReadAtByOther={lastReadAtByOther}
+              />
+            ))}
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -314,23 +312,30 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       </div>
 
       {/* Message Input Form */}
-      <div className="p-4 bg-white/70 backdrop-blur-md border-t border-amber-200">
-        <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+      <div className="p-4 bg-white/40 backdrop-blur-md border-t border-amber-200">
+        <form onSubmit={handleSendMessage} className="composer">
+          {/* Attach */}
+          <button type="button" className="toolbar-btn" title="Attach">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12.79V7a2 2 0 00-2-2h-5.79a2 2 0 00-1.41.59L3 14.39a2 2 0 000 2.83l3.78 3.78a2 2 0 002.83 0l8.39-8.39a2 2 0 000-2.83l-3.17-3.17"/></svg>
+          </button>
+          {/* Textarea */}
           <textarea
             ref={inputRef}
             rows={1}
             value={newMessage}
             onChange={handleTypingChange}
             onKeyDown={handleKeyDown}
-            placeholder="Type an encrypted message (Shift+Enter for newline)"
+            placeholder="Type a message (Shift+Enter for newline)"
             autoComplete="off"
-            className="flex-1 px-4 py-3 rounded-2xl bg-white/80 text-slate-800 placeholder:text-slate-400 border border-amber-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400 resize-none"
+            className="flex-1 bg-transparent outline-none resize-none text-slate-800 placeholder:text-slate-400 px-1 py-2"
           />
-          <button
-            type="submit"
-            className="px-5 py-3 rounded-2xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-semibold shadow-md active:scale-95"
-          >
-            Send
+          {/* Emoji */}
+          <button type="button" className="toolbar-btn" title="Emoji">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M15 9h.01M9 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </button>
+          {/* Send */}
+          <button type="submit" className="toolbar-btn brand-gradient text-white" title="Send">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12l14-7-7 14-2-5-5-2z"/></svg>
           </button>
         </form>
       </div>
@@ -371,11 +376,7 @@ const Message = ({
   }, [message.content, chatKey]);
 
   return (
-    <div
-      className={`flex items-end gap-2 ${
-        mine ? "justify-end" : "justify-start"
-      } mb-1`}
-    >
+    <div className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"} mb-1 relative group`}>
       {!mine && showAvatar && (
         <img
           src={
@@ -397,18 +398,18 @@ const Message = ({
             {message.senderId.displayName || message.senderId.username}
           </div>
         )}
-        <div
-          className={`px-4 py-2 break-words shadow-sm ${
-            mine
-              ? `text-white brand-gradient ${
-                  nextSameSender ? "rounded-2xl rounded-br-md" : "rounded-2xl"
-                }`
-              : `text-slate-900 bg-white/80 border border-amber-200 ${
-                  nextSameSender ? "rounded-2xl rounded-bl-md" : "rounded-2xl"
-                }`
-          }`}
-        >
+        <div className={`bubble ${mine ? "bubble-mine" : "bubble-other"} ${nextSameSender ? (mine ? "rounded-2xl rounded-br-md" : "rounded-2xl rounded-bl-md") : "rounded-2xl"}`}>
           {decryptedContent}
+        </div>
+        {/* Hover toolbar */}
+        <div className="toolbar-floating opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <button className="toolbar-btn" title="React">😄</button>
+          <button className="toolbar-btn" title="Copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+          <button className="toolbar-btn" title="More">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
         </div>
         {/* Timestamp (tiny, subtle) */}
         <div
