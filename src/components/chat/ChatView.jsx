@@ -17,7 +17,9 @@ const AllFriendsModal = ({ open, friends, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40">
       <div className="w-full sm:max-w-md sm:mx-4 bg-white/80 backdrop-blur-md border border-amber-200 rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[92vh] sm:max-h-[80vh] overflow-hidden">
         <div className="relative p-4 border-b border-amber-200 bg-gradient-to-r from-amber-100 to-amber-200">
-          <h3 className="text-base sm:text-lg font-bold text-amber-800">All Friends</h3>
+          <h3 className="text-base sm:text-lg font-bold text-amber-800">
+            All Friends
+          </h3>
           <button
             className="absolute right-3 top-3 px-3 py-1 rounded-lg bg-white/70 text-amber-700 border border-amber-200 hover:bg-white active:scale-95"
             onClick={onClose}

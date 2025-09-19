@@ -13,20 +13,20 @@ const LandingView = ({ setView }) => {
       <div className="pointer-events-none absolute bottom-10 -right-10 w-72 h-72 bg-amber-400/30 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] blur-2xl" />
 
       {/* Navbar */}
-      <header className="flex justify-between items-center px-8 py-5">
+  <header className="flex justify-between items-center px-4 py-4 md:px-8 md:py-5">
         <h1 className="text-2xl font-extrabold text-amber-700 flex items-center gap-2 drop-shadow-sm">
           <Hexagon className="w-7 h-7 text-amber-600" /> BuzzTalk
         </h1>
-        <div className="flex gap-3">
+        <div className="flex gap-2 md:gap-3">
           <button
             onClick={() => setView("login")}
-            className="px-5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-semibold transition shadow-sm active:scale-95"
+            className="px-4 py-1.5 md:px-5 md:py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 font-semibold transition shadow-sm active:scale-95 text-sm md:text-base"
           >
             Login
           </button>
           <button
             onClick={() => setView("register")}
-            className="px-5 py-2 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-semibold transition shadow-sm active:scale-95"
+            className="px-4 py-1.5 md:px-5 md:py-2 rounded-xl bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-semibold transition shadow-sm active:scale-95 text-sm md:text-base"
           >
             Join the Hive
           </button>

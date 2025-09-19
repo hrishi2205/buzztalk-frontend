@@ -312,9 +312,9 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   });
 
   return (
-  <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
+    <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
       {/* Chat Header */}
-  <div className="p-2.5 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-2 md:gap-3 relative z-30">
+      <div className="p-2.5 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-2 md:gap-3 relative z-30">
         {/* Mobile back button */}
         {onBack && (
           <button
@@ -447,7 +447,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       </div>
 
       {/* Messages Container */}
-  <div className="flex-1 p-3 md:p-6 space-y-3 md:space-y-4 overflow-y-auto bg-white/30">
+      <div className="flex-1 p-3 md:p-6 space-y-3 md:space-y-4 overflow-y-auto bg-white/30">
         {groups.map((group) => (
           <div key={group.label}>
             {/* Day separator */}
@@ -479,7 +479,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       </div>
 
       {/* Typing Indicator */}
-  <div className="px-3 md:px-4 pb-1 h-6">
+      <div className="px-3 md:px-4 pb-1 h-6">
         {typingUsers.length > 0 && (
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-200 text-amber-800 text-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-700 animate-pulse" />

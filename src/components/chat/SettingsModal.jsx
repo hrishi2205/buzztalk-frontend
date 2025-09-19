@@ -49,7 +49,9 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30">
       <div className="w-full sm:max-w-md mx-0 sm:mx-4 rounded-t-2xl sm:rounded-2xl bg-white/85 backdrop-blur-md border border-amber-200 shadow-2xl">
         <div className="p-4 border-b border-amber-200 flex items-center justify-between bg-gradient-to-r from-amber-100 to-amber-200 rounded-t-2xl">
-          <h3 className="text-base sm:text-lg font-bold text-amber-800">Settings</h3>
+          <h3 className="text-base sm:text-lg font-bold text-amber-800">
+            Settings
+          </h3>
           <button
             onClick={onClose}
             className="px-3 py-1 rounded-lg bg-white/70 text-amber-700 border border-amber-200 hover:bg-white active:scale-95"
