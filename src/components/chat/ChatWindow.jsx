@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { encryptMessage, decryptMessage } from "../../../utils/crypto.js";
-import { uploadChatFile } from "../../../utils/api.js";
+import { uploadChatFile, deleteChat } from "../../../utils/api.js";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   const [messages, setMessages] = useState([]);
@@ -117,6 +117,16 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     socket.on("userStoppedTyping", handleUserStoppedTyping);
     socket.on("messageReaction", handleMessageReaction);
 
+    // If chat is deleted by you or friend, navigate away
+    const handleChatDeleted = ({ chatId }) => {
+      if (chatId === activeChat._id) {
+        try {
+          onBack?.();
+        } catch {}
+      }
+    };
+    socket.on("chatDeleted", handleChatDeleted);
+
     // Cleanup: remove listeners when component unmounts or socket changes
     return () => {
       socket.off("newMessage", handleNewMessage);
@@ -124,6 +134,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
       socket.off("userTyping", handleUserTyping);
       socket.off("userStoppedTyping", handleUserStoppedTyping);
       socket.off("messageReaction", handleMessageReaction);
+      socket.off("chatDeleted", handleChatDeleted);
     };
   }, [socket, activeChat._id, typingUsers]);
 
@@ -258,6 +269,23 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     }
   };
 
+  // Delete chat (with confirm)
+  const handleDeleteChat = async () => {
+    if (!activeChat?._id) return;
+    const ok = window.confirm(
+      "Delete this chat for both participants? This will remove all messages."
+    );
+    if (!ok) return;
+    try {
+      const token = localStorage.getItem("token");
+      await deleteChat(activeChat._id, token);
+      onBack?.();
+    } catch (e) {
+      console.error("Delete chat failed:", e);
+      alert(e?.message || "Failed to delete chat");
+    }
+  };
+
   // Prepare per-message adjacency markers for bubble shaping
   const enhanced = messages.map((m, idx, arr) => {
     const prev = arr[idx - 1];
@@ -289,7 +317,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   return (
     <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
       {/* Chat Header */}
-      <div className="p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3">
+  <div className="p-3 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3">
         {/* Mobile back button */}
         {onBack && (
           <button
@@ -329,7 +357,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             }`}
           ></span>
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h3 className="font-bold text-lg text-slate-900">
             {activeChat.friend.displayName || activeChat.friend.username}
           </h3>
@@ -345,6 +373,29 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
                 ).toLocaleString()}`
               : "offline"}
           </p>
+        </div>
+        {/* Header actions */}
+        <div className="ml-auto flex items-center gap-2 shrink-0">
+          <button
+            className="hidden md:inline-flex p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200/70 active:scale-95"
+            title="Delete chat"
+            onClick={handleDeleteChat}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"/>
+            </svg>
+          </button>
+          {/* Mobile delete in overflow style */}
+          <button
+            className="md:hidden p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 active:scale-95"
+            title="Delete chat"
+            onClick={handleDeleteChat}
+            aria-label="Delete chat"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"/>
+            </svg>
+          </button>
         </div>
       </div>
 

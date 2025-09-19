@@ -154,3 +154,8 @@ export const uploadChatFile = async (file, token) => {
   }
   return data; // { url, filename, mimetype, size }
 };
+
+// Delete a chat
+export const deleteChat = async (chatId, token) => {
+  return apiRequest(`chats/${chatId}`, "DELETE", null, token);
+};

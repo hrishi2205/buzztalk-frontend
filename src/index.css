@@ -65,6 +65,21 @@ body {
   background: linear-gradient(180deg, #fff7ed, #fde68a);
 }
 
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .glass {
+    border-radius: 0; /* full-bleed on mobile */
+  }
+  .composer {
+    gap: 8px;
+    padding: 8px;
+  }
+  .toolbar-btn {
+    width: 32px;
+    height: 32px; /* larger touch target */
+  }
+}
+
 /* Smooth focus ring */
 :focus-visible {
   outline: 2px solid color-mix(in oklab, var(--brand-500) 40%, transparent);
