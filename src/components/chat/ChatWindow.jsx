@@ -400,15 +400,11 @@ const Message = ({
         <div
           className={`px-4 py-2 break-words shadow-sm ${
             mine
-              ? `text-white bg-gradient-to-b from-amber-400 to-amber-600 ${
-                  nextSameSender
-                    ? "rounded-2xl rounded-br-md"
-                    : "rounded-2xl rounded-br-md"
+              ? `text-white brand-gradient ${
+                  nextSameSender ? "rounded-2xl rounded-br-md" : "rounded-2xl"
                 }`
               : `text-slate-900 bg-white/80 border border-amber-200 ${
-                  nextSameSender
-                    ? "rounded-2xl rounded-bl-md"
-                    : "rounded-2xl rounded-bl-md"
+                  nextSameSender ? "rounded-2xl rounded-bl-md" : "rounded-2xl"
                 }`
           }`}
         >

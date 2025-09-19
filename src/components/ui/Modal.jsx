@@ -1,6 +1,5 @@
 import React from "react";
 import Card from "./Card";
-import Button from "./Button";
 
 const Modal = ({ title, children, onClose, footer }) => {
   return (
@@ -10,9 +9,25 @@ const Modal = ({ title, children, onClose, footer }) => {
           {title && (
             <h3 className="text-xl font-bold text-amber-700">{title}</h3>
           )}
-          <Button variant="secondary" className="px-3 py-1" onClick={onClose}>
-            Close
-          </Button>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="p-2 rounded-lg bg-white/60 border border-amber-200 hover:bg-white/80 active:scale-95"
+          >
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
         {children}
         {footer && <div className="mt-6 flex justify-end">{footer}</div>}

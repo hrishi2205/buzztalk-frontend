@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { apiRequest, uploadAvatarFile } from "../../../utils/api";
 import { generateKeyPair, exportKey } from "../../../utils/crypto";
+import Card from "../ui/Card";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
 
 const RegisterFlow = ({ setView, onRegisterSuccess }) => {
   const [step, setStep] = useState(1);
@@ -20,6 +23,7 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
   const handleStep1 = async (e) => {
     e.preventDefault();
     setError("");
+
     setIsLoading(true);
     try {
       await apiRequest("auth/register/initiate", "POST", { email });
@@ -121,78 +125,70 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
     switch (step) {
       case 1:
         return (
-          <form onSubmit={handleStep1}>
-            <h2 className="text-3xl font-extrabold mb-6 text-center text-amber-600">
-              Step 1: Start Your Journey 🐝
+          <form onSubmit={handleStep1} className="space-y-4">
+            <h2 className="text-3xl font-extrabold text-center text-amber-700">
+              Start Your Journey 🐝
             </h2>
-            <input
+            <p className="text-center text-slate-600">
+              We’ll send a 6-digit code to verify it’s you.
+            </p>
+            <Input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
-              placeholder="Enter your email"
-              className="w-full p-3 mb-4 bg-amber-50 rounded-md text-slate-800 border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              placeholder="you@example.com"
               required
             />
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg transition-colors disabled:bg-slate-400"
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Sending..." : "Continue"}
-            </button>
+            </Button>
           </form>
         );
       case 2:
         return (
-          <form onSubmit={handleStep2}>
-            <h2 className="text-3xl font-extrabold mb-2 text-center text-amber-600">
-              Step 2: Verify Your Hive
+          <form onSubmit={handleStep2} className="space-y-4">
+            <h2 className="text-3xl font-extrabold text-center text-amber-700">
+              Verify Your Hive
             </h2>
-            <p className="text-center text-slate-600 mb-6">
-              An OTP has been sent to <b>{email}</b>.
+            <p className="text-center text-slate-600">
+              We sent a code to <b>{email}</b>.
             </p>
-            <input
+            <Input
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               type="text"
-              placeholder="Enter 6-digit OTP"
-              className="w-full p-3 mb-4 bg-amber-50 rounded-md text-slate-800 border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              placeholder="6-digit code"
               required
             />
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg transition-colors disabled:bg-slate-400"
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Verifying..." : "Verify"}
-            </button>
+            </Button>
           </form>
         );
       case 3:
         return (
-          <form onSubmit={handleStep3}>
-            <h2 className="text-3xl font-extrabold mb-6 text-center text-amber-600">
-              Step 3: Join the Buzz
+          <form onSubmit={handleStep3} className="space-y-4">
+            <h2 className="text-3xl font-extrabold text-center text-amber-700">
+              Join the Buzz
             </h2>
-            <input
+            <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               type="text"
               placeholder="Create a unique username"
-              className="w-full p-3 mb-4 bg-amber-50 rounded-md text-slate-800 border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
               required
               pattern="^[a-zA-Z0-9_]{3,15}$"
               title="Username must be 3-15 characters (letters, numbers, underscores)."
             />
-            <div className="relative mb-4">
-              <input
+            <div className="relative">
+              <Input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type={showPassword ? "text" : "password"}
                 placeholder="Create a strong password"
                 autoComplete="new-password"
-                className="w-full pr-24 pl-4 py-3 bg-amber-50 rounded-md text-slate-800 border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
                 required
+                className="pr-24"
               />
               <button
                 type="button"
@@ -204,14 +200,13 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
-            <input
+            <Input
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               type="text"
               placeholder="Your name (display name)"
-              className="w-full p-3 mb-4 bg-amber-50 rounded-md text-slate-800 border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
-            <div className="mb-4">
+            <div>
               <label className="block text-sm text-slate-700 mb-1">
                 Avatar (optional)
               </label>
@@ -231,24 +226,19 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
                 />
               </div>
               <p className="text-xs text-slate-500 mt-1">
-                You can choose a file to upload. Alternatively, paste an image
-                URL below.
+                Prefer a URL? Paste it below.
               </p>
-              <input
+              <Input
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
                 type="url"
-                placeholder="Or paste avatar URL"
-                className="w-full p-3 mt-2 bg-amber-50 rounded-md text-slate-800 border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                placeholder="https://example.com/me.jpg"
+                className="mt-2"
               />
             </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-lg transition-colors disabled:bg-slate-400"
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Finishing..." : "Finish & Login"}
-            </button>
+            </Button>
           </form>
         );
       default:
@@ -258,20 +248,24 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
 
   return (
     <div className="min-h-screen w-screen flex items-center justify-center p-6 bg-gradient-to-b from-amber-100 via-yellow-50 to-amber-200">
-      <div className="w-full max-w-md p-8 rounded-3xl border bg-white/70 backdrop-blur-md border-amber-200 shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
-        {renderStep()}
-        {error && (
-          <p className="text-red-500 text-sm mt-4 text-center">{error}</p>
-        )}
-        <p className="text-center mt-4 text-sm text-slate-600">
-          Already have an account?{" "}
-          <button
-            onClick={() => setView("login")}
-            className="text-amber-700 hover:underline font-semibold"
-          >
-            Login here
-          </button>
-        </p>
+      <div className="w-full max-w-md">
+        <Card>
+          {renderStep()}
+          {error && (
+            <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-3 py-2 mt-4 text-center">
+              {error}
+            </p>
+          )}
+          <p className="text-center mt-6 text-sm text-slate-600">
+            Already have an account?{" "}
+            <button
+              onClick={() => setView("login")}
+              className="text-amber-700 hover:underline font-semibold"
+            >
+              Login here
+            </button>
+          </p>
+        </Card>
       </div>
     </div>
   );

@@ -126,7 +126,9 @@ const Sidebar = ({
               key={friend._id}
               onClick={() => onSelectFriend(friend)}
               className={`p-4 border-b border-amber-100 hover:bg-amber-50/70 cursor-pointer flex items-center space-x-3 transition-colors ${
-                activeChat?.friend._id === friend._id ? "bg-amber-50/80" : ""
+                activeChat?.friend._id === friend._id
+                  ? "bg-amber-50/80"
+                  : "bg-white/0"
               }`}
             >
               <div className="relative">
