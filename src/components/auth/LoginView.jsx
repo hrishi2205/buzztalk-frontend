@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { apiRequest } from "../../../utils/api";
-import { generateKeyPair, exportKey } from "../../../utils/crypto";
+import {
+  generateKeyPair,
+  exportKey,
+  decryptPrivateKeyWithPassword,
+} from "../../../utils/crypto";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
@@ -26,52 +30,50 @@ const LoginView = ({ setView, onLoginSuccess }) => {
       console.log("Login response userData:", userData);
 
       const username = userData.username;
-      if (username) {
-        const storageKey = `privateKey_${username}`;
-        let storedPriv = localStorage.getItem(storageKey);
-
-        const providedPrivateKey =
-          userData.privateKey ||
-          userData.encryptionKey ||
-          userData.clientPrivateKey;
-        if (!storedPriv && providedPrivateKey) {
-          localStorage.setItem(storageKey, providedPrivateKey);
-          storedPriv = providedPrivateKey;
-          console.log(`Stored provided private key for user: ${username}`);
+      // Decrypt the server-stored encrypted private key using the password
+      if (userData.encryptedPrivateKey) {
+        try {
+          const privateKeyStr = await decryptPrivateKeyWithPassword(
+            userData.encryptedPrivateKey,
+            password
+          );
+          // attach ephemeral private key to userData for runtime use (not persisted to localStorage)
+          userData.__privateKey = privateKeyStr;
+        } catch (e) {
+          console.error("Failed to decrypt server-stored private key:", e);
+          // Migration fallback: if old localStorage key exists, keep using it
+          if (username) {
+            const storageKey = `privateKey_${username}`;
+            const storedPriv = localStorage.getItem(storageKey);
+            if (storedPriv) {
+              userData.__privateKey = storedPriv;
+              toast(
+                "Using locally stored key. Consider re-saving your key to server."
+              );
+            } else {
+              toast.error(
+                "Couldn't unlock your encryption key. Please double-check your password.",
+                { duration: 4000 }
+              );
+            }
+          }
         }
-
-        if (!storedPriv && userData.token) {
+      } else if (username) {
+        // If backend has no EPK yet, migrate from localStorage if present
+        const storageKey = `privateKey_${username}`;
+        const storedPriv = localStorage.getItem(storageKey);
+        if (storedPriv && userData.token) {
           try {
-            console.info(
-              "No local private key found — generating a new key pair and rotating public key..."
-            );
-            const keyPair = await generateKeyPair();
-            const privateKeyStr = await exportKey(keyPair.privateKey);
-            const publicKeyStr = await exportKey(keyPair.publicKey);
-            const jwk = JSON.parse(publicKeyStr);
-            const minimalJwk = {
-              kty: jwk.kty,
-              crv: jwk.crv,
-              x: jwk.x,
-              y: jwk.y,
-            };
-
-            await apiRequest(
-              "users/public-key",
-              "POST",
-              { publicKey: minimalJwk },
-              userData.token
-            );
-
-            localStorage.setItem(storageKey, privateKeyStr);
-            console.info(
-              "Client keys restored and public key rotated successfully."
-            );
-          } catch (keyErr) {
-            console.error("Failed to restore/generate client keys:", keyErr);
-            toast.error(
-              "Logged in, but couldn't restore encryption keys. You may not be able to read old messages until keys are restored."
-            );
+            // Use current password to create EPK and upload
+            const epk = await (
+              await import("../../../utils/crypto")
+            ).encryptPrivateKeyWithPassword(storedPriv, password);
+            await apiRequest("users/private-key", "POST", epk, userData.token);
+            userData.__privateKey = storedPriv;
+            toast.success("Encrypted key saved to your account.");
+          } catch (e) {
+            console.warn("Failed to upload encrypted key:", e.message);
+            userData.__privateKey = storedPriv;
           }
         }
       }

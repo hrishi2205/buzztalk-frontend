@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { apiRequest, uploadAvatarFile } from "../../../utils/api";
-import { generateKeyPair, exportKey } from "../../../utils/crypto";
+import {
+  generateKeyPair,
+  exportKey,
+  encryptPrivateKeyWithPassword,
+} from "../../../utils/crypto";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
@@ -67,7 +71,7 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
     setIsLoading(true);
     try {
       const keyPair = await generateKeyPair();
-      const privateKey = await exportKey(keyPair.privateKey); // stringified JWK (for local storage)
+      const privateKey = await exportKey(keyPair.privateKey); // stringified JWK
       const publicKey = await exportKey(keyPair.publicKey); // stringified JWK
 
       // Backend expects a JWK object; send only the standard members (kty, crv, x, y)
@@ -78,6 +82,9 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
         x: jwk.x,
         y: jwk.y,
       };
+      // Encrypt private key with user's password for server-side storage
+      const epk = await encryptPrivateKeyWithPassword(privateKey, password);
+
       const userData = await apiRequest("auth/register/complete", "POST", {
         verificationToken,
         username: username.toLowerCase(),
@@ -87,9 +94,10 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
         publicKey: minimalJwk,
         // Compatibility alias in case backend expects a different property name
         publicKeyJwk: minimalJwk,
+        encryptedPrivateKey: epk,
       });
 
-      localStorage.setItem(`privateKey_${userData.username}`, privateKey);
+      // Do NOT persist private key to localStorage; it will be retrieved and decrypted on login
       // If an avatar file was selected, upload it and patch the profile
       if (avatarFile) {
         try {

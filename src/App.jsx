@@ -78,7 +78,9 @@ function App() {
   // Callback for when a user successfully logs in or registers
   const handleLoginSuccess = (userData) => {
     // Persist user data to local storage for session management
-    localStorage.setItem("currentUser", JSON.stringify(userData));
+    const { __privateKey, ...persistable } = userData || {};
+    localStorage.setItem("currentUser", JSON.stringify(persistable));
+    // Keep private key only in memory
     setCurrentUser(userData);
     navigate("chat");
   };
@@ -114,8 +116,9 @@ function App() {
             onLogout={handleLogout}
             onAlert={handleAlert}
             onCurrentUserUpdated={(u) => {
+              const { __privateKey, ...persistable } = u || {};
               setCurrentUser(u);
-              localStorage.setItem("currentUser", JSON.stringify(u));
+              localStorage.setItem("currentUser", JSON.stringify(persistable));
             }}
           />
         );

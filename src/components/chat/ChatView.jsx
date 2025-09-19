@@ -5,8 +5,6 @@ import {
   importKey,
   deriveSharedSecret,
   normalizeEcPublicJwk,
-  generateKeyPair,
-  exportKey,
 } from "../../../utils/crypto";
 
 import Sidebar from "./Sidebar";
@@ -209,11 +207,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
     (async () => {
       if (!friends?.length || isWarmupDone) return;
       try {
-        const storedPriv = localStorage.getItem(
-          `privateKey_${currentUser.username}`
-        );
-        if (!storedPriv) return;
-        const myPrivateKey = await importKey(storedPriv, true);
+        const privStr =
+          currentUser?.__privateKey ||
+          localStorage.getItem(`privateKey_${currentUser.username}`);
+        if (!privStr) return;
+        const myPrivateKey = await importKey(privStr, true);
         const entries = await Promise.all(
           friends.map(async (f) => {
             try {
@@ -275,30 +273,13 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       setUnreads((prev) => ({ ...prev, [friend._id]: 0 }));
       let sharedKey = chatKeys[friend._id];
       if (!sharedKey) {
-        let storedPriv = localStorage.getItem(
-          `privateKey_${currentUser.username}`
-        );
-        if (!storedPriv) {
-          const { publicKey, privateKey } = await generateKeyPair();
-          const privateJwk = await exportKey(privateKey);
-          storedPriv = JSON.stringify(privateJwk);
-          localStorage.setItem(
-            `privateKey_${currentUser.username}`,
-            storedPriv
-          );
-          const publicJwk = await exportKey(publicKey);
-          await apiRequest(
-            "users/public-key",
-            "POST",
-            { publicKey: publicJwk },
-            currentUser.token
-          );
-          onAlert(
-            "Security note: your encryption keys were restored for this device.",
-            "success"
-          );
+        const privStr =
+          currentUser?.__privateKey ||
+          localStorage.getItem(`privateKey_${currentUser.username}`);
+        if (!privStr) {
+          throw new Error("Missing private key");
         }
-        const myPrivateKey = await importKey(storedPriv, true);
+        const myPrivateKey = await importKey(privStr, true);
         const normalizedJwk = normalizeEcPublicJwk(friend.publicKey);
         const otherPublicKey = await importKey(normalizedJwk);
         sharedKey = await deriveSharedSecret(myPrivateKey, otherPublicKey);

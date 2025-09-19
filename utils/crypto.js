@@ -122,3 +122,85 @@ export const normalizeEcPublicJwk = (input) => {
   // Return minimal object
   return { kty: jwk.kty, crv: jwk.crv, x: jwk.x, y: jwk.y };
 };
+
+// --- Password-based encryption for private key at rest on server ---
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+const toB64 = (buf) => {
+  const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++)
+    binary += String.fromCharCode(bytes[i]);
+  return typeof btoa === "function"
+    ? btoa(binary)
+    : Buffer.from(binary, "binary").toString("base64");
+};
+
+const fromB64 = (b64) => {
+  const binary =
+    typeof atob === "function"
+      ? atob(b64)
+      : Buffer.from(b64, "base64").toString("binary");
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+};
+
+const getPBKDF2Key = async (password, salt, iterations = 150000) => {
+  const baseKey = await window.crypto.subtle.importKey(
+    "raw",
+    enc.encode(password),
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+  return window.crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt, iterations, hash: "SHA-256" },
+    baseKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+};
+
+export const encryptPrivateKeyWithPassword = async (
+  privateJwkString,
+  password,
+  opts = {}
+) => {
+  const salt = opts.salt || window.crypto.getRandomValues(new Uint8Array(16));
+  const iv = opts.iv || window.crypto.getRandomValues(new Uint8Array(12));
+  const iterations = opts.iterations || 150000;
+  const key = await getPBKDF2Key(password, salt, iterations);
+  const data = enc.encode(privateJwkString);
+  const ct = await window.crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    data
+  );
+  return {
+    ciphertext: toB64(ct),
+    iv: toB64(iv),
+    salt: toB64(salt),
+    iterations,
+    algo: "pbkdf2-aesgcm-v1",
+  };
+};
+
+export const decryptPrivateKeyWithPassword = async (bundle, password) => {
+  if (!bundle || !bundle.ciphertext || !bundle.iv || !bundle.salt) {
+    throw new Error("Invalid encrypted private key bundle");
+  }
+  const iterations = bundle.iterations || 150000;
+  const salt = fromB64(bundle.salt);
+  const iv = fromB64(bundle.iv);
+  const key = await getPBKDF2Key(password, salt, iterations);
+  const ct = fromB64(bundle.ciphertext);
+  const pt = await window.crypto.subtle.decrypt(
+    { name: "AES-GCM", iv },
+    key,
+    ct
+  );
+  return dec.decode(pt);
+};
