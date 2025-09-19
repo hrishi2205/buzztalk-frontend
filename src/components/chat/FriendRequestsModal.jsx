@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { apiRequest } from "../../../utils/api.js";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
@@ -11,8 +11,12 @@ const FriendRequestsModal = ({
   onAlert,
   onRequestsUpdated,
 }) => {
+  const [busyMap, setBusyMap] = useState({}); // requesterId -> bool
+
   const handleResponse = async (requesterId, response) => {
     try {
+      if (busyMap[requesterId]) return;
+      setBusyMap((m) => ({ ...m, [requesterId]: true }));
       // Send the response to the backend API
       await apiRequest(
         "users/friend-request/respond",
@@ -31,19 +35,13 @@ const FriendRequestsModal = ({
       onRequestsUpdated();
     } catch (err) {
       onAlert(err.message, "error");
+    } finally {
+      setBusyMap((m) => ({ ...m, [requesterId]: false }));
     }
   };
 
   return (
-    <Modal
-      title="Friend Requests"
-      onClose={onClose}
-      footer={
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-      }
-    >
+    <Modal title="Friend Requests" onClose={onClose}>
       <div className="max-h-80 overflow-y-auto">
         {requests.length > 0 ? (
           requests.map((req) => (
@@ -64,15 +62,17 @@ const FriendRequestsModal = ({
               <div className="flex gap-2">
                 <Button
                   variant="subtle"
+                  disabled={!!busyMap[req.from._id]}
                   onClick={() => handleResponse(req.from._id, "accept")}
                 >
-                  Accept
+                  {busyMap[req.from._id] ? "Accepting..." : "Accept"}
                 </Button>
                 <Button
                   variant="danger"
+                  disabled={!!busyMap[req.from._id]}
                   onClick={() => handleResponse(req.from._id, "reject")}
                 >
-                  Reject
+                  {busyMap[req.from._id] ? "..." : "Reject"}
                 </Button>
               </div>
             </div>

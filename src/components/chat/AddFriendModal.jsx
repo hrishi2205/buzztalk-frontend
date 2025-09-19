@@ -66,15 +66,7 @@ const AddFriendModal = ({ currentUser, socket, onClose, onAlert }) => {
   };
 
   return (
-    <Modal
-      title="Add a Friend"
-      onClose={onClose}
-      footer={
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-      }
-    >
+    <Modal title="Add a Friend" onClose={onClose}>
       <div className="flex gap-2">
         <Input
           type="text"

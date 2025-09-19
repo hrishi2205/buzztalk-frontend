@@ -4,22 +4,22 @@ const Button = ({
   children,
   variant = "primary",
   className = "",
-  disabled,
+  disabled = false,
   ...props
 }) => {
   const base =
-    "px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed";
+    "px-3 py-1.5 rounded-md text-sm font-medium transition active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed";
   const variants = {
     primary:
-      "bg-amber-500 hover:bg-amber-600 text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50",
+      "bg-gradient-to-b from-amber-400 to-amber-600 text-white hover:from-amber-500 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500/40",
     secondary:
-      "bg-slate-800 hover:bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-slate-500/50",
+      "bg-gradient-to-b from-slate-800 to-slate-900 text-white hover:from-slate-700 hover:to-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500/40",
     ghost:
-      "bg-transparent hover:bg-amber-50 text-amber-700 border border-amber-300",
+      "bg-white/0 hover:bg-white/10 text-amber-700 border border-amber-200 backdrop-blur-sm",
     danger:
-      "bg-red-600 hover:bg-red-700 text-white focus:outline-none focus:ring-2 focus:ring-red-500/50",
+      "bg-gradient-to-b from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/40",
     subtle:
-      "bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300",
+      "bg-amber-50/80 hover:bg-amber-100 text-amber-700 border border-amber-200 backdrop-blur-sm",
   };
   return (
     <button

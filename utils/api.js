@@ -1,4 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// Normalize API base URL for all API/socket calls
+// Priority: VITE_API_URL -> current origin (useful when backend is reverse-proxied under same domain) -> localhost (dev)
+export const API_URL = (
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== "undefined" ? window.location.origin : "") ||
+  "http://localhost:5000"
+).replace(/\/$/, "");
 
 export const apiRequest = async (
   endpoint,
@@ -6,18 +12,110 @@ export const apiRequest = async (
   body = null,
   token = null
 ) => {
-  const options = {
-    method,
-    headers: {},
+  const url = `${API_URL}/api/${endpoint}`;
+
+  const headers = {
+    Accept: "application/json",
   };
   if (token) {
-    options.headers["Content-Type"] = "application/json";
-    options.body = JSON.stringify(body);
+    headers["Authorization"] = `Bearer ${token}`;
   }
-  const response = await fetch(`${API_URL}/api/${endpoint}`, options);
-  const data = await response.json();
+  // If a body is provided, send JSON
+  const hasBody = body !== null && body !== undefined;
+  if (hasBody) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const options = {
+    method,
+    headers,
+    ...(hasBody ? { body: JSON.stringify(body) } : {}),
+  };
+
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch (e) {
+    // Network errors (CORS, DNS, connection refused, etc.)
+    throw new Error(`Network error contacting API: ${e.message}`);
+  }
+
+  let data;
+  const contentType = response.headers.get("content-type") || "";
+  try {
+    if (contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { message: text };
+    }
+  } catch (e) {
+    data = { message: "Invalid response from server" };
+  }
+
   if (!response.ok) {
-    throw new Error(data.message || "API request failed");
+    const msg = data?.message || `API request failed (${response.status})`;
+    throw new Error(msg);
   }
   return data;
+};
+
+// Detect hosting environment
+const host = typeof window !== "undefined" ? window.location.hostname : "";
+const isNetlifyHost = /\.netlify\.app$/i.test(host);
+const isBuzztalkCustomHost = /(^|\.)buzztalk\.me$/i.test(host);
+
+// Socket base URL priority:
+// 1) VITE_SOCKET_URL if provided
+// 2) If on Netlify subdomain, use the dedicated backend origin to bypass proxy
+// 3) Fallback to API_URL (same-origin/proxy)
+export const SOCKET_URL = (
+  import.meta.env.VITE_SOCKET_URL ||
+  (isNetlifyHost || isBuzztalkCustomHost
+    ? "https://server.buzztalk.me"
+    : API_URL)
+).replace(/\/$/, "");
+
+// Expose minimal runtime config for debugging in console
+if (typeof window !== "undefined") {
+  // Avoid overwriting if already set
+  window.__BUZZTALK_CONFIG = window.__BUZZTALK_CONFIG || {
+    API_URL,
+    SOCKET_URL,
+  };
+}
+
+// Upload an avatar file using multipart/form-data. Returns { url }
+export const uploadAvatarFile = async (file, token) => {
+  const url = `${API_URL}/api/upload/avatar`;
+  const form = new FormData();
+  form.append("avatar", file);
+  const headers = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  let response;
+  try {
+    response = await fetch(url, { method: "POST", body: form, headers });
+  } catch (e) {
+    throw new Error(`Network error uploading avatar: ${e.message}`);
+  }
+
+  let data;
+  const contentType = response.headers.get("content-type") || "";
+  try {
+    if (contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { message: text };
+    }
+  } catch (e) {
+    data = { message: "Invalid response from server" };
+  }
+
+  if (!response.ok) {
+    const msg = data?.message || `Avatar upload failed (${response.status})`;
+    throw new Error(msg);
+  }
+  return data; // { url }
 };

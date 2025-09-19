@@ -4,7 +4,7 @@ import Button from "./Button";
 
 const Modal = ({ title, children, onClose, footer }) => {
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 animate-fade-in">
       <Card className="w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
           {title && (

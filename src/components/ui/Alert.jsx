@@ -9,13 +9,19 @@ const Alert = ({ message, type = "success", onClose }) => {
   }, [onClose]);
 
   // Determine the background color based on the alert type
-  const bgColor = type === "error" ? "bg-red-600" : "bg-green-600";
+  const styles =
+    type === "error"
+      ? "bg-red-500/90 border-red-400"
+      : "bg-emerald-500/90 border-emerald-400";
 
   return (
     <div
-      className={`fixed top-5 right-5 p-4 rounded-md shadow-lg text-white ${bgColor} z-50 animate-fade-in-down`}
+      className={`fixed top-5 right-5 px-4 py-3 rounded-xl shadow-lg text-white border backdrop-blur-md ${styles} z-50 transition-all animate-fade-in-down`}
     >
-      {message}
+      <div className="flex items-center gap-2">
+        <span className="inline-block w-2 h-2 rounded-full bg-white/80"></span>
+        <span>{message}</span>
+      </div>
     </div>
   );
 };
