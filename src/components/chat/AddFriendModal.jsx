@@ -95,7 +95,7 @@ const AddFriendModal = ({ currentUser, socket, onClose, onAlert }) => {
                   `https://i.pravatar.cc/32?u=${searchResult.username}`
                 }
                 alt={searchResult.displayName || searchResult.username}
-                className="w-8 h-8 rounded-full"
+                className="w-8 h-8 rounded-full object-cover"
               />
               <div>
                 <div className="text-slate-800 font-medium">

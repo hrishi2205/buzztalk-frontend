@@ -27,7 +27,7 @@ const Sidebar = ({
               `https://i.pravatar.cc/40?u=${currentUser.username}`
             }
             alt={currentUser.displayName || currentUser.username}
-            className="w-9 h-9 rounded-full"
+            className="w-9 h-9 rounded-full object-cover"
           />
           <div>
             <div className="text-base font-bold text-amber-700">
@@ -45,8 +45,18 @@ const Sidebar = ({
             className="p-2 bg-white/70 border border-amber-200 text-amber-700 rounded-full hover:bg-amber-50 active:scale-95"
             title="All Friends"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.5v15m7.5-7.5h-15" />
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4.5v15m7.5-7.5h-15"
+              />
             </svg>
           </button>
           {/* Settings Button */}
@@ -150,7 +160,7 @@ const Sidebar = ({
                     `https://i.pravatar.cc/40?u=${friend.username}`
                   }
                   alt={friend.displayName || friend.username}
-                  className="w-10 h-10 rounded-full"
+                  className="w-10 h-10 rounded-full object-cover"
                 />
                 <span
                   className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white ${

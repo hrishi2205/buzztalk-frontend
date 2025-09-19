@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { uploadChatFile, deleteChat, unfriendUser, blockUser } from "../../../utils/api.js";
+import {
+  uploadChatFile,
+  deleteChat,
+  unfriendUser,
+  blockUser,
+} from "../../../utils/api.js";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   const [messages, setMessages] = useState([]);
@@ -309,7 +314,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   return (
     <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
       {/* Chat Header */}
-      <div className="p-3 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3">
+      <div className="p-3 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3 relative z-30">
         {/* Mobile back button */}
         {onBack && (
           <button
@@ -339,7 +344,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
               `https://i.pravatar.cc/40?u=${activeChat.friend.username}`
             }
             alt={activeChat.friend.displayName || activeChat.friend.username}
-            className="w-10 h-10 rounded-full"
+            className="w-10 h-10 rounded-full object-cover"
           />
           <span
             className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white ${
@@ -367,7 +372,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
           </p>
         </div>
         {/* Header actions */}
-        <div className="ml-auto flex items-center gap-2 shrink-0 relative">
+        <div className="ml-auto flex items-center gap-2 shrink-0 relative z-40">
           {/* Overflow menu */}
           <button
             className="p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200/70 active:scale-95"
@@ -375,22 +380,31 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="More options"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
               <circle cx="12" cy="12" r="1" />
               <circle cx="19" cy="12" r="1" />
               <circle cx="5" cy="12" r="1" />
             </svg>
           </button>
           {menuOpen && (
-            <div className="absolute right-0 top-10 z-10 w-44 bg-white border border-amber-200 rounded-lg shadow-lg overflow-hidden">
+            <div className="absolute right-0 top-10 z-50 w-44 bg-white border border-amber-200 rounded-lg shadow-lg overflow-hidden">
               <button
                 className="w-full text-left px-3 py-2 hover:bg-amber-50 text-slate-800"
                 onClick={async () => {
                   setMenuOpen(false);
                   try {
-                    const token = localStorage.getItem("token") || currentUser?.token;
+                    const token =
+                      localStorage.getItem("token") || currentUser?.token;
                     await unfriendUser(activeChat.friend._id, token);
-                    alert("Unfriended. You can no longer chat unless you add each other again.");
+                    alert(
+                      "Unfriended. You can no longer chat unless you add each other again."
+                    );
                   } catch (e) {
                     alert(e?.message || "Failed to unfriend");
                   }
@@ -402,10 +416,13 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
                 className="w-full text-left px-3 py-2 hover:bg-amber-50 text-red-600"
                 onClick={async () => {
                   setMenuOpen(false);
-                  const ok = window.confirm("Block this user? They won’t be able to message you.");
+                  const ok = window.confirm(
+                    "Block this user? They won’t be able to message you."
+                  );
                   if (!ok) return;
                   try {
-                    const token = localStorage.getItem("token") || currentUser?.token;
+                    const token =
+                      localStorage.getItem("token") || currentUser?.token;
                     await blockUser(activeChat.friend._id, token);
                     alert("User blocked.");
                   } catch (e) {
@@ -622,7 +639,7 @@ const Message = ({
             `https://i.pravatar.cc/28?u=${message.senderId.username}`
           }
           alt={message.senderId.displayName || message.senderId.username}
-          className="w-7 h-7 rounded-full self-end"
+          className="w-7 h-7 rounded-full object-cover self-end"
         />
       )}
       <div className="max-w-[72%]">

@@ -18,7 +18,10 @@ const AllFriendsModal = ({ open, friends, onClose }) => {
       <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-lg">All Friends</h3>
-          <button className="px-2 py-1 text-slate-600 hover:bg-slate-100 rounded" onClick={onClose}>
+          <button
+            className="px-2 py-1 text-slate-600 hover:bg-slate-100 rounded"
+            onClick={onClose}
+          >
             Close
           </button>
         </div>
@@ -27,7 +30,9 @@ const AllFriendsModal = ({ open, friends, onClose }) => {
             friends.map((f) => (
               <div key={f._id} className="flex items-center gap-3 py-2">
                 <img
-                  src={f.avatarUrl || `https://i.pravatar.cc/40?u=${f.username}`}
+                  src={
+                    f.avatarUrl || `https://i.pravatar.cc/40?u=${f.username}`
+                  }
                   alt={f.displayName || f.username}
                   className="w-8 h-8 rounded-full"
                 />
@@ -35,7 +40,9 @@ const AllFriendsModal = ({ open, friends, onClose }) => {
                   <div className="font-medium text-slate-800 truncate">
                     {f.displayName || f.username}
                   </div>
-                  <div className="text-[11px] text-slate-500 truncate">@{f.username}</div>
+                  <div className="text-[11px] text-slate-500 truncate">
+                    @{f.username}
+                  </div>
                 </div>
               </div>
             ))
@@ -101,8 +108,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       // Build last timestamp per friend from chat.lastMessage
       const ts = {};
       chats.forEach((chat) => {
-        const other = (chat.participants || []).find((p) => p._id !== currentUser._id);
-        const last = chat.lastMessage?.createdAt || chat.updatedAt || chat.createdAt;
+        const other = (chat.participants || []).find(
+          (p) => p._id !== currentUser._id
+        );
+        const last =
+          chat.lastMessage?.createdAt || chat.updatedAt || chat.createdAt;
         if (other && last) ts[other._id] = new Date(last).getTime();
       });
       setFriendLastTs(ts);
@@ -302,7 +312,9 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         {!activeChat ? (
           <Sidebar
             currentUser={currentUser}
-            friends={[...friends].sort((a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0))}
+            friends={[...friends].sort(
+              (a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
+            )}
             unreads={unreads}
             requests={friendRequests}
             onLogout={onLogout}
@@ -329,7 +341,10 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
           <AnimateIn type="left" duration={0.45} className="h-full">
             <Sidebar
               currentUser={currentUser}
-                friends={[...friends].sort((a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0))}
+              friends={[...friends].sort(
+                (a, b) =>
+                  (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
+              )}
               unreads={unreads}
               requests={friendRequests}
               onLogout={onLogout}
@@ -337,7 +352,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
               onShowRequests={() => setRequestsModalOpen(true)}
               onSelectFriend={handleSelectFriend}
               onOpenSettings={() => setSettingsOpen(true)}
-                onShowAllFriends={() => setAllFriendsOpen(true)}
+              onShowAllFriends={() => setAllFriendsOpen(true)}
               activeChat={activeChat}
             />
           </AnimateIn>
@@ -415,7 +430,9 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       {isAllFriendsOpen && (
         <AllFriendsModal
           open={isAllFriendsOpen}
-          friends={[...friends].sort((a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0))}
+          friends={[...friends].sort(
+            (a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
+          )}
           onClose={() => setAllFriendsOpen(false)}
         />
       )}

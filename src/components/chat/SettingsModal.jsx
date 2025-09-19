@@ -120,7 +120,9 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="font-semibold text-red-700">Danger zone</div>
-                <div className="text-xs text-red-600">Delete your account permanently</div>
+                <div className="text-xs text-red-600">
+                  Delete your account permanently
+                </div>
               </div>
               <button
                 onClick={() => setShowDelete((v) => !v)}
@@ -132,7 +134,8 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
             {showDelete && (
               <div className="mt-3 space-y-2">
                 <p className="text-sm text-red-700">
-                  This action is irreversible. Please enter your password to confirm.
+                  This action is irreversible. Please enter your password to
+                  confirm.
                 </p>
                 <input
                   type="password"
@@ -167,7 +170,10 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
                         localStorage.removeItem("token");
                         window.location.href = "/";
                       } catch (e) {
-                        onAlert(e.message || "Failed to delete account.", "error");
+                        onAlert(
+                          e.message || "Failed to delete account.",
+                          "error"
+                        );
                       } finally {
                         setDeleting(false);
                       }
