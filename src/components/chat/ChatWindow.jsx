@@ -317,7 +317,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   return (
     <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
       {/* Chat Header */}
-  <div className="p-3 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3">
+      <div className="p-3 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-3">
         {/* Mobile back button */}
         {onBack && (
           <button
@@ -381,8 +381,19 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             title="Delete chat"
             onClick={handleDeleteChat}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"
+              />
             </svg>
           </button>
           {/* Mobile delete in overflow style */}
@@ -392,8 +403,19 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             onClick={handleDeleteChat}
             aria-label="Delete chat"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"
+              />
             </svg>
           </button>
         </div>
