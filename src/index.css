@@ -65,6 +65,23 @@ body {
   background: linear-gradient(180deg, #fff7ed, #fde68a);
 }
 
+/* Landing-like theme utilities */
+.bg-soft-honey {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, #fef3c7 90%, transparent),
+    color-mix(in oklab, #fde68a 80%, transparent)
+  );
+}
+.bg-dot-grid {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(0, 0, 0, 0.06) 1px,
+    transparent 1px
+  );
+  background-size: 16px 16px;
+}
+
 /* Mobile optimizations */
 @media (max-width: 480px) {
   .glass {

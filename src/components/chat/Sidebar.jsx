@@ -15,9 +15,10 @@ const Sidebar = ({
   const requestsCount = requests.length;
 
   return (
-    <div className="w-full glass flex flex-col md:rounded-l-2xl">
+    <div className="w-full glass flex flex-col md:rounded-l-2xl overflow-hidden">
       {/* Header Section */}
-      <div className="p-4 border-b border-amber-200 flex justify-between items-center">
+      <div className="p-4 border-b border-amber-200 flex justify-between items-center relative bg-soft-honey">
+        <div className="absolute inset-0 pointer-events-none opacity-50 bg-dot-grid" />
         <div className="flex items-center gap-3">
           <img
             src={
@@ -36,7 +37,7 @@ const Sidebar = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 relative z-[1]">
           {/* Settings Button */}
           <button
             onClick={onOpenSettings}
@@ -127,8 +128,8 @@ const Sidebar = ({
               onClick={() => onSelectFriend(friend)}
               className={`p-4 border-b border-amber-100 cursor-pointer flex items-center space-x-3 transition-colors ${
                 activeChat?.friend._id === friend._id
-                  ? "bg-amber-50/70 gradient-sheen"
-                  : "hover:bg-amber-50/50"
+                  ? "bg-amber-50/80 gradient-sheen"
+                  : "hover:bg-amber-50/60"
               }`}
             >
               <div className="relative">
