@@ -1,10 +1,24 @@
 import React from "react";
 import Card from "./Card";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Modal = ({ title, children, onClose, footer }) => {
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-md p-4 animate-fade-in">
-      <Card className="w-full max-w-md">
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-md p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: 8 }}
+          transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
+          className="w-full max-w-md"
+        >
+          <Card className="w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
           {title && (
             <h3 className="text-xl font-bold text-amber-700">{title}</h3>
@@ -31,8 +45,10 @@ const Modal = ({ title, children, onClose, footer }) => {
         </div>
         {children}
         {footer && <div className="mt-6 flex justify-end">{footer}</div>}
-      </Card>
-    </div>
+          </Card>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

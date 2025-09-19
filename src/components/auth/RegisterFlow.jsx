@@ -9,6 +9,7 @@ import {
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import AnimateIn from "../motion/AnimateIn";
 
 const RegisterFlow = ({ setView, onRegisterSuccess }) => {
   const [step, setStep] = useState(1);
@@ -257,14 +258,15 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
   return (
     <div className="min-h-screen w-screen flex items-center justify-center p-6 bg-gradient-to-b from-amber-100 via-yellow-50 to-amber-200">
       <div className="w-full max-w-md">
-        <Card>
-          {renderStep()}
+        <AnimateIn type="up" duration={0.5}>
+          <Card>
+            <AnimateIn type="fade" delay={0.05}>{renderStep()}</AnimateIn>
           {error && (
             <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-3 py-2 mt-4 text-center">
               {error}
             </p>
           )}
-          <p className="text-center mt-6 text-sm text-slate-600">
+            <p className="text-center mt-6 text-sm text-slate-600">
             Already have an account?{" "}
             <button
               onClick={() => setView("login")}
@@ -272,8 +274,9 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
             >
               Login here
             </button>
-          </p>
-        </Card>
+            </p>
+          </Card>
+        </AnimateIn>
       </div>
     </div>
   );

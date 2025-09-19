@@ -12,6 +12,7 @@ import ChatWindow from "./ChatWindow";
 import AddFriendModal from "./AddFriendModal";
 import FriendRequestsModal from "./FriendRequestsModal";
 import SettingsModal from "./SettingsModal";
+import AnimateIn from "../motion/AnimateIn";
 
 const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [socket, setSocket] = useState(null);
@@ -332,7 +333,8 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       {/* Desktop/Tablet split */}
       <div className="hidden md:flex h-full w-full">
         <div className="md:w-80 lg:w-96 shrink-0">
-          <Sidebar
+          <AnimateIn type="left" duration={0.45}>
+            <Sidebar
             currentUser={currentUser}
             friends={friends}
             unreads={unreads}
@@ -343,18 +345,22 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             onSelectFriend={handleSelectFriend}
             onOpenSettings={() => setSettingsOpen(true)}
             activeChat={activeChat}
-          />
+            />
+          </AnimateIn>
         </div>
         <div className="flex-1 min-w-0 flex">
           {activeChat ? (
-            <ChatWindow
+            <AnimateIn type="up" duration={0.35}>
+              <ChatWindow
               currentUser={currentUser}
               socket={socket}
               activeChat={activeChat}
               onBack={() => setActiveChat(null)}
-            />
+              />
+            </AnimateIn>
           ) : (
-            <div className="h-full w-full flex flex-col items-center justify-center text-slate-500">
+            <AnimateIn type="fade" duration={0.5}>
+              <div className="h-full w-full flex flex-col items-center justify-center text-slate-500">
               <svg
                 className="w-24 h-24 mb-4"
                 fill="none"
@@ -369,7 +375,8 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
                 />
               </svg>
               <p className="text-lg">Select a friend to start a conversation</p>
-            </div>
+              </div>
+            </AnimateIn>
           )}
         </div>
       </div>

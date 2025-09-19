@@ -134,20 +134,21 @@ function App() {
       <Toaster
         position="top-right"
         toastOptions={{
-          duration: 2600,
+          duration: 2800,
+          className:
+            "!rounded-2xl !px-4 !py-3 !border !border-amber-200 !backdrop-blur-md !shadow-xl",
           style: {
             background: "rgba(255,255,255,0.9)",
             color: "#0f172a",
-            borderRadius: "14px",
-            border: "1px solid rgba(251,191,36,0.35)", // amber-300
-            boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-            backdropFilter: "blur(10px)",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
           },
           success: {
             duration: 2600,
+            iconTheme: { primary: "#10b981", secondary: "white" },
           },
           error: {
-            duration: 3200,
+            duration: 3400,
+            iconTheme: { primary: "#ef4444", secondary: "white" },
           },
         }}
       />

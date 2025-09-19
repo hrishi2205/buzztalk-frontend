@@ -9,6 +9,7 @@ import {
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
+import AnimateIn from "../motion/AnimateIn";
 
 const LoginView = ({ setView, onLoginSuccess }) => {
   const [identifier, setIdentifier] = useState("");
@@ -96,7 +97,8 @@ const LoginView = ({ setView, onLoginSuccess }) => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-amber-50 via-yellow-100 to-amber-200">
       <div className="relative w-full max-w-md">
-        <Card>
+        <AnimateIn type="up" duration={0.5}>
+          <Card>
           {/* Bee Logo */}
           <div className="flex justify-center mb-6">
             <div className="h-16 w-16 flex items-center justify-center rounded-full brand-gradient shadow-md">
@@ -164,7 +166,8 @@ const LoginView = ({ setView, onLoginSuccess }) => {
               Register now
             </button>
           </p>
-        </Card>
+          </Card>
+        </AnimateIn>
       </div>
     </div>
   );
