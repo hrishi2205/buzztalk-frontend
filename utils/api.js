@@ -159,3 +159,18 @@ export const uploadChatFile = async (file, token) => {
 export const deleteChat = async (chatId, token) => {
   return apiRequest(`chats/${chatId}`, "DELETE", null, token);
 };
+
+// Unfriend a user (both sides)
+export const unfriendUser = async (userId, token) => {
+  return apiRequest("users/unfriend", "POST", { userId }, token);
+};
+
+// Block a user (adds to current user's blocked list and removes friendship)
+export const blockUser = async (userId, token) => {
+  return apiRequest("users/block", "POST", { userId }, token);
+};
+
+// Unblock a user
+export const unblockUser = async (userId, token) => {
+  return apiRequest("users/unblock", "POST", { userId }, token);
+};

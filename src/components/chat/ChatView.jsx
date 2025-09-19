@@ -10,6 +10,44 @@ import SettingsModal from "./SettingsModal";
 import AnimateIn from "../motion/AnimateIn";
 // Encryption removed: UnlockKeyModal no longer used
 
+// Simple All Friends modal
+const AllFriendsModal = ({ open, friends, onClose }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-xl w-[90%] max-w-md p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-lg">All Friends</h3>
+          <button className="px-2 py-1 text-slate-600 hover:bg-slate-100 rounded" onClick={onClose}>
+            Close
+          </button>
+        </div>
+        <div className="max-h-96 overflow-y-auto divide-y">
+          {friends?.length ? (
+            friends.map((f) => (
+              <div key={f._id} className="flex items-center gap-3 py-2">
+                <img
+                  src={f.avatarUrl || `https://i.pravatar.cc/40?u=${f.username}`}
+                  alt={f.displayName || f.username}
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium text-slate-800 truncate">
+                    {f.displayName || f.username}
+                  </div>
+                  <div className="text-[11px] text-slate-500 truncate">@{f.username}</div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-slate-600 text-sm">No friends yet.</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [socket, setSocket] = useState(null);
   const [friends, setFriends] = useState([]);
@@ -21,6 +59,8 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [isAddFriendModalOpen, setAddFriendModalOpen] = useState(false);
   const [isRequestsModalOpen, setRequestsModalOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [isAllFriendsOpen, setAllFriendsOpen] = useState(false);
+  const [friendLastTs, setFriendLastTs] = useState({}); // friendId -> last message ts
   // Encryption removed: no unlock/warmup
   const [openBusy, setOpenBusy] = useState({}); // friendId -> bool
   // Refs to avoid effect re-subscription storms
@@ -58,6 +98,14 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       });
       setUnreads(map);
       setChatMap(cMap);
+      // Build last timestamp per friend from chat.lastMessage
+      const ts = {};
+      chats.forEach((chat) => {
+        const other = (chat.participants || []).find((p) => p._id !== currentUser._id);
+        const last = chat.lastMessage?.createdAt || chat.updatedAt || chat.createdAt;
+        if (other && last) ts[other._id] = new Date(last).getTime();
+      });
+      setFriendLastTs(ts);
     } catch (error) {
       onAlert(error.message, "error");
     }
@@ -254,7 +302,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         {!activeChat ? (
           <Sidebar
             currentUser={currentUser}
-            friends={friends}
+            friends={[...friends].sort((a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0))}
             unreads={unreads}
             requests={friendRequests}
             onLogout={onLogout}
@@ -262,6 +310,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             onShowRequests={() => setRequestsModalOpen(true)}
             onSelectFriend={handleSelectFriend}
             onOpenSettings={() => setSettingsOpen(true)}
+            onShowAllFriends={() => setAllFriendsOpen(true)}
             activeChat={activeChat}
           />
         ) : (
@@ -280,7 +329,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
           <AnimateIn type="left" duration={0.45} className="h-full">
             <Sidebar
               currentUser={currentUser}
-              friends={friends}
+                friends={[...friends].sort((a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0))}
               unreads={unreads}
               requests={friendRequests}
               onLogout={onLogout}
@@ -288,6 +337,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
               onShowRequests={() => setRequestsModalOpen(true)}
               onSelectFriend={handleSelectFriend}
               onOpenSettings={() => setSettingsOpen(true)}
+                onShowAllFriends={() => setAllFriendsOpen(true)}
               activeChat={activeChat}
             />
           </AnimateIn>
@@ -360,6 +410,13 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             // Refresh friends list to pick up possible changes
             fetchData();
           }}
+        />
+      )}
+      {isAllFriendsOpen && (
+        <AllFriendsModal
+          open={isAllFriendsOpen}
+          friends={[...friends].sort((a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0))}
+          onClose={() => setAllFriendsOpen(false)}
         />
       )}
       {/* Encryption removed: unlock modal no longer shown */}

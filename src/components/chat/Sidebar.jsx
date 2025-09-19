@@ -10,6 +10,7 @@ const Sidebar = ({
   onShowRequests,
   onSelectFriend,
   onOpenSettings,
+  onShowAllFriends,
   activeChat,
 }) => {
   const requestsCount = requests.length;
@@ -38,6 +39,16 @@ const Sidebar = ({
           </div>
         </div>
         <div className="flex items-center space-x-2 relative z-[1]">
+          {/* All Friends Button */}
+          <button
+            onClick={onShowAllFriends}
+            className="p-2 bg-white/70 border border-amber-200 text-amber-700 rounded-full hover:bg-amber-50 active:scale-95"
+            title="All Friends"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
           {/* Settings Button */}
           <button
             onClick={onOpenSettings}

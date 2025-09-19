@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { uploadChatFile, deleteChat } from "../../../utils/api.js";
+import { uploadChatFile, deleteChat, unfriendUser, blockUser } from "../../../utils/api.js";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   const [messages, setMessages] = useState([]);
@@ -10,6 +10,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   let typingTimeout = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Helpers: date formatting and grouping
   const isSameDay = (a, b) => {
@@ -267,7 +268,8 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
     );
     if (!ok) return;
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || currentUser?.token || undefined;
       await deleteChat(activeChat._id, token);
       onBack?.();
     } catch (e) {
@@ -365,49 +367,65 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
           </p>
         </div>
         {/* Header actions */}
-        <div className="ml-auto flex items-center gap-2 shrink-0">
+        <div className="ml-auto flex items-center gap-2 shrink-0 relative">
+          {/* Overflow menu */}
           <button
-            className="hidden md:inline-flex p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200/70 active:scale-95"
-            title="Delete chat"
-            onClick={handleDeleteChat}
+            className="p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200/70 active:scale-95"
+            title="More"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="More options"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"
-              />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="1" />
+              <circle cx="19" cy="12" r="1" />
+              <circle cx="5" cy="12" r="1" />
             </svg>
           </button>
-          {/* Mobile delete in overflow style */}
-          <button
-            className="md:hidden p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 active:scale-95"
-            title="Delete chat"
-            onClick={handleDeleteChat}
-            aria-label="Delete chat"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0h8m-8 0a2 2 0 012-2h4a2 2 0 012 2"
-              />
-            </svg>
-          </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-10 z-10 w-44 bg-white border border-amber-200 rounded-lg shadow-lg overflow-hidden">
+              <button
+                className="w-full text-left px-3 py-2 hover:bg-amber-50 text-slate-800"
+                onClick={async () => {
+                  setMenuOpen(false);
+                  try {
+                    const token = localStorage.getItem("token") || currentUser?.token;
+                    await unfriendUser(activeChat.friend._id, token);
+                    alert("Unfriended. You can no longer chat unless you add each other again.");
+                  } catch (e) {
+                    alert(e?.message || "Failed to unfriend");
+                  }
+                }}
+              >
+                Unfriend
+              </button>
+              <button
+                className="w-full text-left px-3 py-2 hover:bg-amber-50 text-red-600"
+                onClick={async () => {
+                  setMenuOpen(false);
+                  const ok = window.confirm("Block this user? They won’t be able to message you.");
+                  if (!ok) return;
+                  try {
+                    const token = localStorage.getItem("token") || currentUser?.token;
+                    await blockUser(activeChat.friend._id, token);
+                    alert("User blocked.");
+                  } catch (e) {
+                    alert(e?.message || "Failed to block user");
+                  }
+                }}
+              >
+                Block
+              </button>
+              <button
+                className="w-full text-left px-3 py-2 hover:bg-amber-50 text-slate-800"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleDeleteChat();
+                }}
+              >
+                Delete chat
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -564,7 +582,11 @@ const Message = ({
     // Try to parse as JSON for attachment support
     try {
       const parsed = JSON.parse(content);
-      if (parsed && typeof parsed === "object" && parsed.type === "attachment") {
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        parsed.type === "attachment"
+      ) {
         setContentObj(parsed);
         setDisplayContent("");
       } else if (
