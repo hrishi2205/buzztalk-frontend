@@ -99,73 +99,73 @@ const LoginView = ({ setView, onLoginSuccess }) => {
       <div className="relative w-full max-w-md">
         <AnimateIn type="up" duration={0.5}>
           <Card>
-          {/* Bee Logo */}
-          <div className="flex justify-center mb-6">
-            <div className="h-16 w-16 flex items-center justify-center rounded-full brand-gradient shadow-md">
-              <span className="text-3xl text-white">🐝</span>
+            {/* Bee Logo */}
+            <div className="flex justify-center mb-6">
+              <div className="h-16 w-16 flex items-center justify-center rounded-full brand-gradient shadow-md">
+                <span className="text-3xl text-white">🐝</span>
+              </div>
             </div>
-          </div>
 
-          {/* Title */}
-          <h2 className="text-3xl font-extrabold text-center text-amber-700 mb-2">
-            Buzz In to Buzztalk
-          </h2>
-          <p className="text-center text-slate-600 mb-8">
-            Welcome back to your hive
-          </p>
+            {/* Title */}
+            <h2 className="text-3xl font-extrabold text-center text-amber-700 mb-2">
+              Buzz In to Buzztalk
+            </h2>
+            <p className="text-center text-slate-600 mb-8">
+              Welcome back to your hive
+            </p>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              type="text"
-              placeholder="Email or Username"
-              required
-            />
-
-            <div className="relative">
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
               <Input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                autoComplete="current-password"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                type="text"
+                placeholder="Email or Username"
                 required
-                className="pr-24"
               />
+
+              <div className="relative">
+                <Input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  autoComplete="current-password"
+                  required
+                  className="pr-24"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 px-3 m-1 rounded-lg text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-sm font-medium"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+
+              {error && (
+                <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+                  {error}
+                </p>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Buzzing in..." : "Login"}
+              </Button>
+            </form>
+
+            {/* Footer */}
+            <p className="text-center mt-8 text-sm text-slate-600">
+              No hive yet?{" "}
               <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                aria-pressed={showPassword}
-                className="absolute inset-y-0 right-0 px-3 m-1 rounded-lg text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-sm font-medium"
+                onClick={() => setView("register")}
+                className="text-amber-700 hover:underline font-semibold"
               >
-                {showPassword ? "Hide" : "Show"}
+                Register now
               </button>
-            </div>
-
-            {error && (
-              <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-3 py-2">
-                {error}
-              </p>
-            )}
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Buzzing in..." : "Login"}
-            </Button>
-          </form>
-
-          {/* Footer */}
-          <p className="text-center mt-8 text-sm text-slate-600">
-            No hive yet?{" "}
-            <button
-              onClick={() => setView("register")}
-              className="text-amber-700 hover:underline font-semibold"
-            >
-              Register now
-            </button>
-          </p>
+            </p>
           </Card>
         </AnimateIn>
       </div>

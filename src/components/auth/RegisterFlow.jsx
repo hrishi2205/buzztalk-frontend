@@ -260,20 +260,22 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
       <div className="w-full max-w-md">
         <AnimateIn type="up" duration={0.5}>
           <Card>
-            <AnimateIn type="fade" delay={0.05}>{renderStep()}</AnimateIn>
-          {error && (
-            <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-3 py-2 mt-4 text-center">
-              {error}
-            </p>
-          )}
+            <AnimateIn type="fade" delay={0.05}>
+              {renderStep()}
+            </AnimateIn>
+            {error && (
+              <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-3 py-2 mt-4 text-center">
+                {error}
+              </p>
+            )}
             <p className="text-center mt-6 text-sm text-slate-600">
-            Already have an account?{" "}
-            <button
-              onClick={() => setView("login")}
-              className="text-amber-700 hover:underline font-semibold"
-            >
-              Login here
-            </button>
+              Already have an account?{" "}
+              <button
+                onClick={() => setView("login")}
+                className="text-amber-700 hover:underline font-semibold"
+              >
+                Login here
+              </button>
             </p>
           </Card>
         </AnimateIn>
