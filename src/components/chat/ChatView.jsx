@@ -13,6 +13,7 @@ import AddFriendModal from "./AddFriendModal";
 import FriendRequestsModal from "./FriendRequestsModal";
 import SettingsModal from "./SettingsModal";
 import AnimateIn from "../motion/AnimateIn";
+import UnlockKeyModal from "./UnlockKeyModal";
 
 const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [socket, setSocket] = useState(null);
@@ -25,6 +26,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   const [isAddFriendModalOpen, setAddFriendModalOpen] = useState(false);
   const [isRequestsModalOpen, setRequestsModalOpen] = useState(false);
   const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [showUnlock, setShowUnlock] = useState(false);
   const [isWarmupDone, setIsWarmupDone] = useState(false);
   const [openBusy, setOpenBusy] = useState({}); // friendId -> bool
   // Refs to avoid effect re-subscription storms
@@ -66,6 +68,13 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       onAlert(error.message, "error");
     }
   }, [currentUser.token, onAlert]);
+
+  // Prompt to unlock private key if missing in memory but available encrypted on account
+  useEffect(() => {
+    if (!currentUser?.__privateKey && currentUser?.encryptedPrivateKey) {
+      setShowUnlock(true);
+    }
+  }, [currentUser?.__privateKey, currentUser?.encryptedPrivateKey]);
   // Socket setup with websocket-first and fallback
   useEffect(() => {
     retriedTransportRef.current = false;
@@ -415,6 +424,17 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             onCurrentUserUpdated?.(updated);
             // Refresh friends list to pick up possible changes
             fetchData();
+          }}
+        />
+      )}
+      {showUnlock && (
+        <UnlockKeyModal
+          currentUser={currentUser}
+          onClose={() => setShowUnlock(false)}
+          onAlert={onAlert}
+          onUnlocked={(updated) => {
+            onCurrentUserUpdated?.(updated);
+            setShowUnlock(false);
           }}
         />
       )}
