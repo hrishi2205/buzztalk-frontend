@@ -90,13 +90,21 @@ const AddFriendModal = ({ currentUser, socket, onClose, onAlert }) => {
           <div className="flex items-center justify-between p-3 rounded-md bg-amber-50 border border-amber-200">
             <div className="flex items-center space-x-3">
               <img
-                src={`https://i.pravatar.cc/32?u=${searchResult.username}`}
-                alt={searchResult.username}
+                src={
+                  searchResult.avatarUrl ||
+                  `https://i.pravatar.cc/32?u=${searchResult.username}`
+                }
+                alt={searchResult.displayName || searchResult.username}
                 className="w-8 h-8 rounded-full"
               />
-              <span className="text-slate-800 font-medium">
-                {searchResult.username}
-              </span>
+              <div>
+                <div className="text-slate-800 font-medium">
+                  {searchResult.displayName || searchResult.username}
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  @{searchResult.username}
+                </div>
+              </div>
             </div>
             <Button
               onClick={() => handleSendRequest(searchResult._id)}

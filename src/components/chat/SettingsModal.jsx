@@ -8,6 +8,9 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
   const [avatarUrl, setAvatarUrl] = useState(currentUser.avatarUrl || "");
   const [avatarFile, setAvatarFile] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -112,6 +115,72 @@ const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
             </button>
           </div>
         </form>
+        <div className="px-4 pb-4">
+          <div className="mt-3 p-3 border border-red-200 rounded-xl bg-red-50">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-semibold text-red-700">Danger zone</div>
+                <div className="text-xs text-red-600">Delete your account permanently</div>
+              </div>
+              <button
+                onClick={() => setShowDelete((v) => !v)}
+                className="px-3 py-1 rounded-lg bg-red-600 text-white"
+              >
+                Delete Account
+              </button>
+            </div>
+            {showDelete && (
+              <div className="mt-3 space-y-2">
+                <p className="text-sm text-red-700">
+                  This action is irreversible. Please enter your password to confirm.
+                </p>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-white/70 text-slate-800 border border-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-400"
+                  placeholder="Your password"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowDelete(false)}
+                    className="px-3 py-1 rounded-lg bg-slate-200 text-slate-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    disabled={deleting || deletePassword.length === 0}
+                    onClick={async () => {
+                      try {
+                        setDeleting(true);
+                        await apiRequest(
+                          "users/delete-account",
+                          "POST",
+                          { password: deletePassword },
+                          currentUser.token
+                        );
+                        onAlert("Account deleted.", "success");
+                        // Clean local state and force logout/refresh
+                        localStorage.removeItem("currentUser");
+                        localStorage.removeItem("token");
+                        window.location.href = "/";
+                      } catch (e) {
+                        onAlert(e.message || "Failed to delete account.", "error");
+                      } finally {
+                        setDeleting(false);
+                      }
+                    }}
+                    className="px-3 py-1 rounded-lg bg-red-600 text-white"
+                  >
+                    {deleting ? "Deleting..." : "Confirm Delete"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
