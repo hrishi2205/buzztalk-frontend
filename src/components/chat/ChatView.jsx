@@ -319,10 +319,17 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   };
 
   return (
-    <div className="h-screen w-full bg-stone-50 text-slate-900">
-      <div className="h-full w-full overflow-hidden">
+    <div className="h-screen w-full bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-100 text-slate-900">
+      <div className="h-full w-full overflow-hidden relative">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-amber-300/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-yellow-300/20 rounded-full blur-3xl animate-pulse delay-500" />
+        </div>
+        
         {/* Mobile flow */}
-        <div className="md:hidden h-full w-full flex">
+        <div className="md:hidden h-full w-full flex relative z-10">
           {!activeChat ? (
             <Sidebar
               currentUser={currentUser}
@@ -351,9 +358,10 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         </div>
 
         {/* Desktop/Tablet split */}
-        <div className="hidden md:flex h-full w-full">
-          <div className="md:w-80 lg:w-96 shrink-0">
-            <AnimateIn type="left" duration={0.45} className="h-full">
+        <div className="hidden md:flex h-full w-full relative z-10">
+          <div className="md:w-80 lg:w-96 shrink-0 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-amber-100/50 to-orange-100/50 backdrop-blur-xl" />
+            <AnimateIn type="left" duration={0.45} className="h-full relative z-10">
               <Sidebar
                 currentUser={currentUser}
                 friends={[...friends].sort(
@@ -372,12 +380,13 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
               />
             </AnimateIn>
           </div>
-          <div className="flex-1 min-w-0 flex">
+          <div className="flex-1 min-w-0 flex relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-amber-50/60 backdrop-blur-xl" />
             {activeChat ? (
               <AnimateIn
                 type="up"
                 duration={0.35}
-                className="flex-1 min-w-0 flex"
+                className="flex-1 min-w-0 flex relative z-10"
               >
                 <ChatWindow
                   currentUser={currentUser}
@@ -387,24 +396,53 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
                 />
               </AnimateIn>
             ) : (
-              <AnimateIn type="fade" duration={0.5} className="h-full w-full">
-                <div className="h-full w-full flex flex-col items-center justify-center text-slate-500 bg-white/30">
-                  <svg
-                    className="w-24 h-24 mb-4 text-amber-600"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    />
-                  </svg>
-                  <p className="text-lg text-amber-700">
-                    Select a friend to start buzzing 🐝
-                  </p>
+              <AnimateIn type="fade" duration={0.5} className="h-full w-full relative z-10">
+                <div className="h-full w-full flex flex-col items-center justify-center text-slate-600 relative">
+                  {/* Hexagon pattern background */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-20 left-20 w-16 h-16 bg-amber-400 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] animate-bounce" />
+                    <div className="absolute top-40 right-32 w-12 h-12 bg-orange-400 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] animate-bounce delay-300" />
+                    <div className="absolute bottom-32 left-40 w-20 h-20 bg-yellow-400 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] animate-bounce delay-700" />
+                  </div>
+                  
+                  {/* Main content */}
+                  <div className="text-center space-y-6 max-w-md mx-auto px-8">
+                    <div className="relative">
+                      <div className="w-32 h-32 mx-auto mb-6 relative">
+                        <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full animate-ping opacity-20" />
+                        <div className="absolute inset-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                          <svg
+                            className="w-16 h-16 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                        Ready to Buzz? 🐝
+                      </h3>
+                      <p className="text-lg text-slate-600">
+                        Select a friend from your hive to start an encrypted conversation
+                      </p>
+                      <div className="flex items-center justify-center gap-2 text-sm text-amber-700 bg-amber-100/60 px-4 py-2 rounded-full border border-amber-200">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                        End-to-end encrypted
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </AnimateIn>
             )}

@@ -312,13 +312,13 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   });
 
   return (
-    <div className="flex w-full h-full flex-col glass overflow-hidden md:rounded-r-2xl">
+    <div className="flex w-full h-full flex-col glass overflow-hidden md:rounded-r-2xl shadow-2xl border border-amber-200/50">
       {/* Chat Header */}
-      <div className="p-2.5 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-2 md:gap-3 relative z-30">
+      <div className="p-3 md:p-4 border-b border-amber-200/60 bg-gradient-to-r from-white/70 to-amber-100/70 backdrop-blur-xl flex items-center gap-2 md:gap-3 relative z-30 shadow-sm">
         {/* Mobile back button */}
         {onBack && (
           <button
-            className="md:hidden mr-1 p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 active:scale-95"
+            className="md:hidden mr-2 p-2.5 rounded-xl bg-white/80 text-amber-700 border border-amber-300/60 hover:bg-white hover:scale-105 active:scale-95 transition-all duration-200 shadow-md"
             onClick={onBack}
             aria-label="Back"
           >
@@ -337,45 +337,55 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             </svg>
           </button>
         )}
-        <div className="relative">
+        <div className="relative group">
           <img
             src={
               activeChat.friend.avatarUrl ||
               `https://i.pravatar.cc/40?u=${activeChat.friend.username}`
             }
             alt={activeChat.friend.displayName || activeChat.friend.username}
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-12 h-12 rounded-full object-cover ring-3 ring-amber-300/60 shadow-lg group-hover:ring-amber-400 group-hover:scale-105 transition-all duration-300"
           />
           <span
-            className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white ${
+            className={`absolute -bottom-0.5 -right-0.5 block h-3.5 w-3.5 rounded-full ring-2 ring-white shadow-sm ${
               activeChat.friend.status === "online"
-                ? "bg-green-500"
+                ? "bg-green-500 animate-pulse"
                 : "bg-slate-400"
             }`}
           ></span>
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-bold text-base md:text-lg text-slate-900 truncate">
+          <h3 className="font-bold text-base md:text-lg bg-gradient-to-r from-amber-700 to-orange-700 bg-clip-text text-transparent truncate">
             {activeChat.friend.displayName || activeChat.friend.username}
           </h3>
-          <p className="text-[11px] text-slate-500 truncate">
+          <p className="text-xs text-amber-600/80 truncate flex items-center gap-1">
+            <span className={`w-1.5 h-1.5 rounded-full ${activeChat.friend.status === "online" ? "bg-green-500 animate-pulse" : "bg-slate-400"}`} />
             @{activeChat.friend.username}
           </p>
-          <p className="text-[10px] md:text-xs text-slate-500 truncate">
-            {activeChat.friend.status === "online"
-              ? "online"
-              : activeChat.friend.lastSeen
-              ? `last seen ${new Date(
-                  activeChat.friend.lastSeen
-                ).toLocaleString()}`
-              : "offline"}
+          <p className="text-xs text-slate-600 truncate flex items-center gap-1">
+            {activeChat.friend.status === "online" ? (
+              <>
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-green-600 font-medium">Active now</span>
+              </>
+            ) : activeChat.friend.lastSeen ? (
+              <>
+                <span className="w-2 h-2 bg-slate-400 rounded-full" />
+                <span>last seen {new Date(activeChat.friend.lastSeen).toLocaleString()}</span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 bg-slate-400 rounded-full" />
+                <span>offline</span>
+              </>
+            )}
           </p>
         </div>
         {/* Header actions */}
-        <div className="ml-auto flex items-center gap-2 shrink-0 relative z-40">
+        <div className="ml-auto flex items-center gap-3 shrink-0 relative z-40">
           {/* Overflow menu */}
           <button
-            className="p-2 rounded-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200/70 active:scale-95"
+            className="p-2.5 rounded-xl bg-white/80 text-amber-700 border border-amber-300/60 hover:bg-white hover:scale-105 active:scale-95 transition-all duration-200 shadow-md"
             title="More"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="More options"
