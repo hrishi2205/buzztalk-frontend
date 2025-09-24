@@ -312,9 +312,9 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   });
 
   return (
-    <div className="flex w-full flex-col glass overflow-hidden md:rounded-r-2xl">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-white/80 backdrop-blur-md">
       {/* Chat Header */}
-      <div className="p-2.5 md:p-4 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-2 md:gap-3 relative z-30">
+      <div className="p-3 border-b border-amber-200 bg-white/50 backdrop-blur-md flex items-center gap-2 md:gap-3 relative z-30">
         {/* Mobile back button */}
         {onBack && (
           <button
