@@ -324,11 +324,6 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         );
       } catch {}
       setUnreads((prev) => ({ ...prev, [friend._id]: 0 }));
-      // Update friend timestamp to keep recently opened chats at top
-      setFriendLastTs((prev) => ({
-        ...prev,
-        [friend._id]: Date.now(),
-      }));
       // No shared key; use plaintext
       setActiveChat({ ...chat, friend, messages });
       // Ensure socket joins this chat's room to receive real-time messages

@@ -545,7 +545,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             value={newMessage}
             onChange={handleTypingChange}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message (Shift+Enter for newline)"
+            placeholder="Type a message"
             autoComplete="off"
             className="flex-1 bg-transparent outline-none resize-none text-slate-800 placeholder:text-slate-400 px-1 py-2"
           />
