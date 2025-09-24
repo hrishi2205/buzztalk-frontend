@@ -18,8 +18,8 @@ const Sidebar = ({
   return (
     <div className="w-full glass flex flex-col md:rounded-l-2xl overflow-hidden">
       {/* Header Section */}
-      <div className="p-4 border-b border-amber-200 flex justify-between items-center relative bg-soft-honey">
-        <div className="absolute inset-0 pointer-events-none opacity-50 bg-dot-grid" />
+      <div className="p-4 border-b border-orange-200 flex justify-between items-center relative bg-gradient-to-r from-amber-100 to-orange-100">
+        <div className="absolute inset-0 pointer-events-none opacity-30 bg-dot-grid" />
         <div className="flex items-center gap-3">
           <img
             src={
@@ -27,13 +27,13 @@ const Sidebar = ({
               `https://i.pravatar.cc/40?u=${currentUser.username}`
             }
             alt={currentUser.displayName || currentUser.username}
-            className="w-9 h-9 rounded-full object-cover"
+            className="w-9 h-9 rounded-full object-cover ring-2 ring-orange-200"
           />
           <div>
-            <div className="text-base font-bold text-amber-700">
+            <div className="text-base font-bold text-slate-800">
               {currentUser.displayName || currentUser.username}
             </div>
-            <div className="text-[11px] text-slate-500">
+            <div className="text-[11px] text-orange-600">
               @{currentUser.username}
             </div>
           </div>
@@ -42,7 +42,7 @@ const Sidebar = ({
           {/* All Friends Button */}
           <button
             onClick={onShowAllFriends}
-            className="p-2 sm:p-2.5 bg-white/80 border border-amber-200 text-amber-700 rounded-full hover:bg-white shadow-sm active:scale-95"
+            className="p-2 sm:p-2.5 bg-stone-50/90 border border-orange-300 text-orange-700 rounded-full hover:bg-white shadow-sm active:scale-95"
             title="All Friends"
           >
             <svg
@@ -62,7 +62,7 @@ const Sidebar = ({
           {/* Settings Button */}
           <button
             onClick={onOpenSettings}
-            className="p-2 sm:p-2.5 bg-white/80 border border-amber-200 text-amber-700 rounded-full hover:bg-white shadow-sm active:scale-95"
+            className="p-2 sm:p-2.5 bg-stone-50/90 border border-orange-300 text-orange-700 rounded-full hover:bg-white shadow-sm active:scale-95"
             title="Settings"
           >
             <svg
@@ -88,7 +88,7 @@ const Sidebar = ({
           {/* Friend Requests Button */}
           <button
             onClick={onShowRequests}
-            className="p-2 bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white rounded-full relative shadow-sm active:scale-95"
+            className="p-2 bg-gradient-to-b from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 text-white rounded-full relative shadow-sm active:scale-95"
             title="Friend Requests"
           >
             <svg
@@ -113,7 +113,7 @@ const Sidebar = ({
           {/* Add Friend Button */}
           <button
             onClick={onAddFriend}
-            className="p-2 bg-gradient-to-b from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white rounded-full font-bold text-lg leading-none flex items-center justify-center w-8 h-8 shadow-sm active:scale-95"
+            className="p-2 bg-gradient-to-b from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white rounded-full font-bold text-lg leading-none flex items-center justify-center w-8 h-8 shadow-sm active:scale-95"
             title="Add Friend"
           >
             +
@@ -121,7 +121,7 @@ const Sidebar = ({
           {/* Logout Button */}
           <button
             onClick={onLogout}
-            className="p-2 bg-gradient-to-b from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-full shadow-sm active:scale-95"
+            className="p-2 bg-gradient-to-b from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white rounded-full shadow-sm active:scale-95"
             title="Logout"
           >
             <svg
@@ -147,10 +147,10 @@ const Sidebar = ({
             <div
               key={friend._id}
               onClick={() => onSelectFriend(friend)}
-              className={`p-4 border-b border-amber-100 cursor-pointer flex items-center space-x-3 transition-colors ${
+              className={`p-4 border-b border-orange-100 cursor-pointer flex items-center space-x-3 transition-colors ${
                 activeChat?.friend._id === friend._id
-                  ? "bg-amber-50/80 gradient-sheen"
-                  : "hover:bg-amber-50/60"
+                  ? "bg-gradient-to-r from-orange-100/80 to-amber-100/80 gradient-sheen"
+                  : "hover:bg-orange-50/60"
               }`}
             >
               <div className="relative">
@@ -160,7 +160,7 @@ const Sidebar = ({
                     `https://i.pravatar.cc/40?u=${friend.username}`
                   }
                   alt={friend.displayName || friend.username}
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-orange-200"
                 />
                 <span
                   className={`absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white ${
@@ -172,12 +172,12 @@ const Sidebar = ({
                 <p className="font-bold text-slate-900 truncate">
                   {friend.displayName || friend.username}
                 </p>
-                <p className="text-[11px] text-slate-500 truncate">
+                <p className="text-[11px] text-orange-600 truncate">
                   @{friend.username}
                 </p>
               </div>
               {unreads[friend._id] > 0 && (
-                <span className="ml-auto bg-blue-600 text-white text-[11px] rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center shadow-sm">
+                <span className="ml-auto bg-orange-600 text-white text-[11px] rounded-full h-5 min-w-5 px-1.5 flex items-center justify-center shadow-sm">
                   {unreads[friend._id] > 99 ? "99+" : unreads[friend._id]}
                 </span>
               )}

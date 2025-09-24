@@ -129,26 +129,32 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen min-w-full bg-gradient-to-b from-yellow-50 to-amber-100">
+    <div
+      className={`min-h-screen min-w-full ${
+        view === "chat"
+          ? "bg-stone-50"
+          : "bg-gradient-to-b from-amber-50 via-orange-50 to-yellow-100"
+      }`}
+    >
       {/* Global toaster for modern toast notifications */}
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 2800,
           className:
-            "!rounded-2xl !px-4 !py-3 !border !border-amber-200 !backdrop-blur-md !shadow-xl",
+            "!rounded-2xl !px-4 !py-3 !border !border-amber-300 !backdrop-blur-md !shadow-xl",
           style: {
-            background: "rgba(255,255,255,0.9)",
-            color: "#0f172a",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+            background: "rgba(255,248,235,0.95)", // off-white with honey warmth
+            color: "#1c1c1c", // dark charcoal
+            boxShadow: "0 10px 30px rgba(245,158,11,0.15)",
           },
           success: {
             duration: 2600,
-            iconTheme: { primary: "#10b981", secondary: "white" },
+            iconTheme: { primary: "#f59e0b", secondary: "white" }, // amber/orange
           },
           error: {
             duration: 3400,
-            iconTheme: { primary: "#ef4444", secondary: "white" },
+            iconTheme: { primary: "#ea580c", secondary: "white" }, // orange-red
           },
         }}
       />

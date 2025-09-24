@@ -319,7 +319,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   };
 
   return (
-    <div className="h-screen w-full bg-gradient-to-b from-yellow-50 to-amber-100 text-slate-900">
+    <div className="h-screen w-full bg-stone-50 text-slate-900">
       {/* Mobile flow */}
       <div className="md:hidden h-full w-full flex">
         {!activeChat ? (

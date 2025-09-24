@@ -18,15 +18,15 @@ const Button = ({
   };
   const variants = {
     primary:
-      "brand-gradient text-white shadow-md hover:brightness-105 focus-visible:ring-2 focus-visible:ring-amber-500/40",
+      "bg-gradient-to-b from-amber-400 to-orange-500 text-white shadow-md hover:from-amber-500 hover:to-orange-600 focus-visible:ring-2 focus-visible:ring-orange-500/40",
     secondary:
       "bg-slate-900 text-white hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-400/40",
     ghost:
-      "bg-white/0 hover:bg-white/10 text-amber-700 border border-amber-200 backdrop-blur-sm",
+      "bg-white/0 hover:bg-orange-50/20 text-orange-700 border border-orange-200 backdrop-blur-sm",
     danger:
       "bg-gradient-to-b from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 focus-visible:ring-2 focus-visible:ring-red-500/40",
     subtle:
-      "bg-amber-50/80 hover:bg-amber-100 text-amber-700 border border-amber-200 backdrop-blur-sm",
+      "bg-orange-50/80 hover:bg-orange-100 text-orange-700 border border-orange-200 backdrop-blur-sm",
   };
   return (
     <button
