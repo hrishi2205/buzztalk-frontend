@@ -95,8 +95,8 @@ const LoginView = ({ setView, onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-amber-50 via-yellow-100 to-amber-200">
-      <div className="relative w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:px-4 bg-gradient-to-br from-amber-50 via-yellow-100 to-amber-200">
+      <div className="relative w-full max-w-sm sm:max-w-md">
         <AnimateIn type="up" duration={0.5}>
           <Card>
             {/* Bee Logo */}
@@ -107,10 +107,10 @@ const LoginView = ({ setView, onLoginSuccess }) => {
             </div>
 
             {/* Title */}
-            <h2 className="text-3xl font-extrabold text-center text-slate-800 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-slate-800 mb-2">
               Buzz In to Buzztalk
             </h2>
-            <p className="text-center text-orange-600 mb-8">
+            <p className="text-center text-orange-600 mb-6 sm:mb-8 text-sm sm:text-base">
               Welcome back to your hive
             </p>
 
@@ -132,14 +132,14 @@ const LoginView = ({ setView, onLoginSuccess }) => {
                   placeholder="Password"
                   autoComplete="current-password"
                   required
-                  className="pr-24"
+                  className="pr-16 sm:pr-20"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   aria-pressed={showPassword}
-                  className="absolute inset-y-0 right-0 px-3 m-1 rounded-lg text-orange-700 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-sm font-medium"
+                  className="absolute inset-y-0 right-0 px-2 sm:px-3 m-1 rounded-lg text-orange-700 hover:text-orange-800 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-xs sm:text-sm font-medium"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
