@@ -180,8 +180,20 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         const ac = activeChatRef.current;
         const isActive = ac && message.chatId === ac._id;
         const senderId = message.senderId?._id || message.senderId;
+
+        // Update friend last message timestamp to move them to top
+        const friendId = chatMapRef.current[message.chatId];
+        if (friendId) {
+          const messageTime = new Date(
+            message.createdAt || Date.now()
+          ).getTime();
+          setFriendLastTs((prev) => ({
+            ...prev,
+            [friendId]: messageTime,
+          }));
+        }
+
         if (!isActive && senderId !== currentUser._id) {
-          const friendId = chatMapRef.current[message.chatId];
           if (friendId) {
             setUnreads((prev) => ({
               ...prev,
@@ -280,6 +292,13 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
       setSettingsOpen(true);
       return;
     }
+
+    // Toggle functionality: if clicking on already active chat, close it
+    if (activeChat?.friend._id === friend._id) {
+      setActiveChat(null);
+      return;
+    }
+
     try {
       if (openBusy[friend._id]) return;
       setOpenBusy((m) => ({ ...m, [friend._id]: true }));
@@ -305,6 +324,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         );
       } catch {}
       setUnreads((prev) => ({ ...prev, [friend._id]: 0 }));
+      // Update friend timestamp to keep recently opened chats at top
+      setFriendLastTs((prev) => ({
+        ...prev,
+        [friend._id]: Date.now(),
+      }));
       // No shared key; use plaintext
       setActiveChat({ ...chat, friend, messages });
       // Ensure socket joins this chat's room to receive real-time messages
@@ -327,7 +351,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-orange-300/20 rounded-full blur-3xl animate-pulse delay-1000" />
           <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-yellow-300/20 rounded-full blur-3xl animate-pulse delay-500" />
         </div>
-        
+
         {/* Mobile flow */}
         <div className="md:hidden h-full w-full flex relative z-10">
           {!activeChat ? (
@@ -361,7 +385,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
         <div className="hidden md:flex h-full w-full relative z-10">
           <div className="md:w-80 lg:w-96 shrink-0 relative">
             <div className="absolute inset-0 bg-gradient-to-b from-amber-100/50 to-orange-100/50 backdrop-blur-xl" />
-            <AnimateIn type="left" duration={0.45} className="h-full relative z-10">
+            <AnimateIn
+              type="left"
+              duration={0.2}
+              className="h-full relative z-10"
+            >
               <Sidebar
                 currentUser={currentUser}
                 friends={[...friends].sort(
@@ -385,7 +413,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             {activeChat ? (
               <AnimateIn
                 type="up"
-                duration={0.35}
+                duration={0.15}
                 className="flex-1 min-w-0 flex relative z-10"
               >
                 <ChatWindow
@@ -396,7 +424,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
                 />
               </AnimateIn>
             ) : (
-              <AnimateIn type="fade" duration={0.5} className="h-full w-full relative z-10">
+              <AnimateIn
+                type="fade"
+                duration={0.2}
+                className="h-full w-full relative z-10"
+              >
                 <div className="h-full w-full flex flex-col items-center justify-center text-slate-600 relative">
                   {/* Hexagon pattern background */}
                   <div className="absolute inset-0 opacity-10">
@@ -404,7 +436,7 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
                     <div className="absolute top-40 right-32 w-12 h-12 bg-orange-400 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] animate-bounce delay-300" />
                     <div className="absolute bottom-32 left-40 w-20 h-20 bg-yellow-400 [clip-path:polygon(25%_6.7%,75%_6.7%,100%_50%,75%_93.3%,25%_93.3%,0_50%)] animate-bounce delay-700" />
                   </div>
-                  
+
                   {/* Main content */}
                   <div className="text-center space-y-6 max-w-md mx-auto px-8">
                     <div className="relative">
@@ -427,17 +459,26 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <h3 className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                         Ready to Buzz? 🐝
                       </h3>
                       <p className="text-lg text-slate-600">
-                        Select a friend from your hive to start an encrypted conversation
+                        Select a friend from your hive to start an encrypted
+                        conversation
                       </p>
                       <div className="flex items-center justify-center gap-2 text-sm text-amber-700 bg-amber-100/60 px-4 py-2 rounded-full border border-amber-200">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         End-to-end encrypted
                       </div>

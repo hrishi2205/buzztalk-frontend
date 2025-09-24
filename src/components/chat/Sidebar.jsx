@@ -16,7 +16,7 @@ const Sidebar = ({
   const requestsCount = requests.length;
 
   return (
-    <div className="w-full h-full glass flex flex-col md:rounded-l-2xl overflow-hidden shadow-2xl border border-amber-200/50">
+    <div className="w-full h-full glass flex flex-col md:rounded-lg overflow-hidden shadow-2xl border border-amber-200/50">
       {/* Header Section */}
       <div className="p-4 border-b border-orange-200/60 flex justify-between items-center relative bg-gradient-to-r from-amber-100/80 to-orange-100/80 backdrop-blur-xl">
         {/* Animated background pattern */}
@@ -169,7 +169,7 @@ const Sidebar = ({
                 } transform-gpu`}
                 style={{
                   animationDelay: `${index * 50}ms`,
-                  animation: "fadeInUp 0.3s ease-out forwards"
+                  animation: "fadeInUp 0.3s ease-out forwards",
                 }}
               >
                 <div className="relative">
@@ -183,8 +183,8 @@ const Sidebar = ({
                   />
                   <span
                     className={`absolute -bottom-0.5 -right-0.5 block h-3.5 w-3.5 rounded-full ring-2 ring-white shadow-sm transition-all duration-300 ${
-                      friend.status === "online" 
-                        ? "bg-green-500 animate-pulse" 
+                      friend.status === "online"
+                        ? "bg-green-500 animate-pulse"
                         : "bg-slate-400"
                     }`}
                   />
@@ -194,11 +194,19 @@ const Sidebar = ({
                     {friend.displayName || friend.username}
                   </p>
                   <p className="text-xs text-orange-600/80 truncate flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${friend.status === "online" ? "bg-green-500 animate-pulse" : "bg-slate-400"}`} />
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        friend.status === "online"
+                          ? "bg-green-500 animate-pulse"
+                          : "bg-slate-400"
+                      }`}
+                    />
                     @{friend.username}
                   </p>
                   {friend.status === "online" && (
-                    <p className="text-xs text-green-600 font-medium">Active now</p>
+                    <p className="text-xs text-green-600 font-medium">
+                      Active now
+                    </p>
                   )}
                 </div>
                 {unreads[friend._id] > 0 && (
@@ -214,13 +222,20 @@ const Sidebar = ({
         ) : (
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
             <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-amber-700 mb-2">No Friends Yet</h3>
+            <h3 className="text-lg font-semibold text-amber-700 mb-2">
+              No Friends Yet
+            </h3>
             <p className="text-sm text-slate-600 mb-4 max-w-xs">
-              Start building your hive! Add friends to begin secure conversations.
+              Start building your hive! Add friends to begin secure
+              conversations.
             </p>
             <button
               onClick={onAddFriend}

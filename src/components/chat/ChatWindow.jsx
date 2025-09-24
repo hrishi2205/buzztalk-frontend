@@ -312,7 +312,7 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   });
 
   return (
-    <div className="flex w-full h-full flex-col glass overflow-hidden md:rounded-r-2xl shadow-2xl border border-amber-200/50">
+    <div className="flex w-full h-full flex-col glass overflow-hidden md:rounded-lg shadow-2xl border border-amber-200/50">
       {/* Chat Header */}
       <div className="p-3 md:p-4 border-b border-amber-200/60 bg-gradient-to-r from-white/70 to-amber-100/70 backdrop-blur-xl flex items-center gap-2 md:gap-3 relative z-30 shadow-sm">
         {/* Mobile back button */}
@@ -359,7 +359,13 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             {activeChat.friend.displayName || activeChat.friend.username}
           </h3>
           <p className="text-xs text-amber-600/80 truncate flex items-center gap-1">
-            <span className={`w-1.5 h-1.5 rounded-full ${activeChat.friend.status === "online" ? "bg-green-500 animate-pulse" : "bg-slate-400"}`} />
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                activeChat.friend.status === "online"
+                  ? "bg-green-500 animate-pulse"
+                  : "bg-slate-400"
+              }`}
+            />
             @{activeChat.friend.username}
           </p>
           <p className="text-xs text-slate-600 truncate flex items-center gap-1">
@@ -371,7 +377,10 @@ const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
             ) : activeChat.friend.lastSeen ? (
               <>
                 <span className="w-2 h-2 bg-slate-400 rounded-full" />
-                <span>last seen {new Date(activeChat.friend.lastSeen).toLocaleString()}</span>
+                <span>
+                  last seen{" "}
+                  {new Date(activeChat.friend.lastSeen).toLocaleString()}
+                </span>
               </>
             ) : (
               <>
