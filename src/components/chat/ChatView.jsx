@@ -319,40 +319,11 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
   };
 
   return (
-    <div className="h-screen w-full bg-stone-50 text-slate-900 p-2 md:p-4">
-      <div className="h-full w-full border border-amber-200 rounded-2xl overflow-hidden glass-card">
+    <div className="h-screen w-full bg-stone-50 text-slate-900">
+      <div className="h-full w-full overflow-hidden">
         {/* Mobile flow */}
         <div className="md:hidden h-full w-full flex">
-        {!activeChat ? (
-          <Sidebar
-            currentUser={currentUser}
-            friends={[...friends].sort(
-              (a, b) => (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
-            )}
-            unreads={unreads}
-            requests={friendRequests}
-            onLogout={onLogout}
-            onAddFriend={() => setAddFriendModalOpen(true)}
-            onShowRequests={() => setRequestsModalOpen(true)}
-            onSelectFriend={handleSelectFriend}
-            onOpenSettings={() => setSettingsOpen(true)}
-            onShowAllFriends={() => setAllFriendsOpen(true)}
-            activeChat={activeChat}
-          />
-        ) : (
-          <ChatWindow
-            currentUser={currentUser}
-            socket={socket}
-            activeChat={activeChat}
-            onBack={() => setActiveChat(null)}
-          />
-        )}
-      </div>
-
-      {/* Desktop/Tablet split */}
-      <div className="hidden md:flex h-full w-full">
-        <div className="md:w-80 lg:w-96 shrink-0 border-r border-amber-200">
-          <AnimateIn type="left" duration={0.45} className="h-full">
+          {!activeChat ? (
             <Sidebar
               currentUser={currentUser}
               friends={[...friends].sort(
@@ -369,46 +340,76 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
               onShowAllFriends={() => setAllFriendsOpen(true)}
               activeChat={activeChat}
             />
-          </AnimateIn>
-        </div>
-        <div className="flex-1 min-w-0 flex">
-          {activeChat ? (
-            <AnimateIn
-              type="up"
-              duration={0.35}
-              className="flex-1 min-w-0 flex"
-            >
-              <ChatWindow
-                currentUser={currentUser}
-                socket={socket}
-                activeChat={activeChat}
-                onBack={() => setActiveChat(null)}
-              />
-            </AnimateIn>
           ) : (
-            <AnimateIn type="fade" duration={0.5} className="h-full w-full">
-              <div className="h-full w-full flex flex-col items-center justify-center text-slate-500 bg-white/30">
-                <svg
-                  className="w-24 h-24 mb-4 text-amber-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                  />
-                </svg>
-                <p className="text-lg text-amber-700">
-                  Select a friend to start buzzing 🐝
-                </p>
-              </div>
-            </AnimateIn>
+            <ChatWindow
+              currentUser={currentUser}
+              socket={socket}
+              activeChat={activeChat}
+              onBack={() => setActiveChat(null)}
+            />
           )}
         </div>
-      </div>
+
+        {/* Desktop/Tablet split */}
+        <div className="hidden md:flex h-full w-full">
+          <div className="md:w-80 lg:w-96 shrink-0">
+            <AnimateIn type="left" duration={0.45} className="h-full">
+              <Sidebar
+                currentUser={currentUser}
+                friends={[...friends].sort(
+                  (a, b) =>
+                    (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
+                )}
+                unreads={unreads}
+                requests={friendRequests}
+                onLogout={onLogout}
+                onAddFriend={() => setAddFriendModalOpen(true)}
+                onShowRequests={() => setRequestsModalOpen(true)}
+                onSelectFriend={handleSelectFriend}
+                onOpenSettings={() => setSettingsOpen(true)}
+                onShowAllFriends={() => setAllFriendsOpen(true)}
+                activeChat={activeChat}
+              />
+            </AnimateIn>
+          </div>
+          <div className="flex-1 min-w-0 flex">
+            {activeChat ? (
+              <AnimateIn
+                type="up"
+                duration={0.35}
+                className="flex-1 min-w-0 flex"
+              >
+                <ChatWindow
+                  currentUser={currentUser}
+                  socket={socket}
+                  activeChat={activeChat}
+                  onBack={() => setActiveChat(null)}
+                />
+              </AnimateIn>
+            ) : (
+              <AnimateIn type="fade" duration={0.5} className="h-full w-full">
+                <div className="h-full w-full flex flex-col items-center justify-center text-slate-500 bg-white/30">
+                  <svg
+                    className="w-24 h-24 mb-4 text-amber-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    />
+                  </svg>
+                  <p className="text-lg text-amber-700">
+                    Select a friend to start buzzing 🐝
+                  </p>
+                </div>
+              </AnimateIn>
+            )}
+          </div>
+        </div>
       </div>
 
       {isAddFriendModalOpen && (

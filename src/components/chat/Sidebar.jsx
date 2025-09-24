@@ -16,9 +16,9 @@ const Sidebar = ({
   const requestsCount = requests.length;
 
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden bg-white/80 backdrop-blur-md">
+    <div className="w-full h-full glass flex flex-col md:rounded-l-2xl overflow-hidden">
       {/* Header Section */}
-      <div className="p-3 border-b border-orange-200 flex justify-between items-center relative bg-gradient-to-r from-amber-100 to-orange-100">
+      <div className="p-4 border-b border-orange-200 flex justify-between items-center relative bg-gradient-to-r from-amber-100 to-orange-100">
         <div className="absolute inset-0 pointer-events-none opacity-30 bg-dot-grid" />
         <div className="flex items-center gap-3">
           <img
