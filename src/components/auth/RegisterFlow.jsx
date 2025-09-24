@@ -219,7 +219,7 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
               <label className="block text-sm text-slate-700 font-medium">
                 Avatar (optional)
               </label>
-              
+
               {avatarFile && (
                 <div className="flex items-center gap-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
                   <img
@@ -244,7 +244,7 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
                   </button>
                 </div>
               )}
-              
+
               <div>
                 <input
                   id="avatar-file"
@@ -257,10 +257,10 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
                   htmlFor="avatar-file"
                   className="block w-full cursor-pointer text-center px-4 py-3 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-semibold text-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border-0"
                 >
-                  {avatarFile ? 'Change Photo 📸' : 'Choose Photo 📸'}
+                  {avatarFile ? "Change Photo 📸" : "Choose Photo 📸"}
                 </label>
               </div>
-              
+
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-amber-200"></div>
@@ -269,7 +269,7 @@ const RegisterFlow = ({ setView, onRegisterSuccess }) => {
                   <span className="bg-white px-2 text-slate-500">or</span>
                 </div>
               </div>
-              
+
               <div>
                 <Input
                   value={avatarUrl}

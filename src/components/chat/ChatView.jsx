@@ -187,10 +187,15 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
           const messageTime = new Date(
             message.createdAt || Date.now()
           ).getTime();
-          setFriendLastTs((prev) => ({
-            ...prev,
-            [friendId]: messageTime,
-          }));
+          console.log(`📨 New message from friend ${friendId}, updating timestamp to ${messageTime}`);
+          setFriendLastTs((prev) => {
+            const updated = {
+              ...prev,
+              [friendId]: messageTime,
+            };
+            console.log('🔄 Updated friendLastTs:', updated);
+            return updated;
+          });
         }
 
         if (!isActive && senderId !== currentUser._id) {
@@ -352,10 +357,18 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
           {!activeChat ? (
             <Sidebar
               currentUser={currentUser}
-              friends={[...friends].sort(
-                (a, b) =>
-                  (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
-              )}
+              friends={(() => {
+                const sortedFriends = [...friends].sort(
+                  (a, b) =>
+                    (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
+                );
+                console.log('👥 Sorted friends:', sortedFriends.map(f => ({
+                  name: f.displayName || f.username,
+                  timestamp: friendLastTs[f._id] || 0,
+                  date: friendLastTs[f._id] ? new Date(friendLastTs[f._id]).toLocaleString() : 'No messages'
+                })));
+                return sortedFriends;
+              })()}
               unreads={unreads}
               requests={friendRequests}
               onLogout={onLogout}
@@ -387,10 +400,13 @@ const ChatView = ({ currentUser, onLogout, onAlert, onCurrentUserUpdated }) => {
             >
               <Sidebar
                 currentUser={currentUser}
-                friends={[...friends].sort(
-                  (a, b) =>
-                    (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
-                )}
+                friends={(() => {
+                  const sortedFriends = [...friends].sort(
+                    (a, b) =>
+                      (friendLastTs[b._id] || 0) - (friendLastTs[a._id] || 0)
+                  );
+                  return sortedFriends;
+                })()}
                 unreads={unreads}
                 requests={friendRequests}
                 onLogout={onLogout}
