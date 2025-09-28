@@ -4,7 +4,7 @@ import {
   deleteChat,
   unfriendUser,
   blockUser,
-} from "../../../utils/api.js";
+} from "../../utils/api";
 
 const ChatWindow = ({ currentUser, socket, activeChat, onBack }) => {
   const [messages, setMessages] = useState([]);

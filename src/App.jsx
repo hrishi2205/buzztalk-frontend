@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { apiRequest } from "../utils/api";
+import { apiRequest } from "./utils/api";
 import { Toaster } from "react-hot-toast";
 import LandingView from "./components/auth/LandingView.jsx";
 import LoginView from "./components/auth/LoginView.jsx";

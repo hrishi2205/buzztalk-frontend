@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { decryptPrivateKeyWithPassword } from "../../../utils/crypto";
+import { decryptPrivateKeyWithPassword } from "../../utils/crypto";
 
 const UnlockKeyModal = ({ currentUser, onUnlocked, onClose, onAlert }) => {
   const [password, setPassword] = useState("");

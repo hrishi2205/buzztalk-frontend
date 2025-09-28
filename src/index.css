@@ -1,5 +1,6 @@
-/* Global styles and Tailwind */
 @import "tailwindcss";
+
+/* Global styles */
 
 :root {
   /* Brand */

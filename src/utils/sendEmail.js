@@ -1,3 +1,25 @@
+// Frontend-only email send stub. Real email dispatch must happen on the backend.
+// This function calls a backend endpoint instead of using SendGrid SDK directly.
+// Expected backend route: POST /api/email/send
+// Payload: { to, subject?, text?, html?, templateId?, dynamicTemplateData? }
+
+import { apiRequest } from "./api";
+
+export const sendEmail = async (options) => {
+  if (!options || !options.to) {
+    throw new Error("sendEmail requires at least a 'to' field");
+  }
+  try {
+    await apiRequest("email/send", "POST", options);
+  } catch (e) {
+    // Non-fatal log for diagnostics in the browser.
+    // eslint-disable-next-line no-console
+    console.warn("sendEmail backend request failed:", e.message);
+    throw e;
+  }
+};
+
+export default sendEmail;
 const sgMail = require("@sendgrid/mail");
 const dotenv = require("dotenv");
 dotenv.config();

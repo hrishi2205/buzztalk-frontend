@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { apiRequest, uploadAvatarFile } from "../../../utils/api";
+import { apiRequest, uploadAvatarFile } from "../../utils/api";
 import {
   generateKeyPair,
   exportKey,
   encryptPrivateKeyWithPassword,
-} from "../../../utils/crypto";
+} from "../../utils/crypto";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";

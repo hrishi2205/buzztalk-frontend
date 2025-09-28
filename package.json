@@ -1,35 +1,35 @@
 {
-  "name": "chat-app-backend",
-  "version": "1.0.0",
-  "description": "BuzzTalk backend service (Express + Socket.IO + MongoDB)",
-  "main": "server.js",
-  "type": "commonjs",
+  "name": "chat-app-frontend",
+  "version": "1.0.1",
+  "private": true,
+  "description": "BuzzTalk React frontend (pure client, separated from backend)",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "dedupe:chats": "node scripts/dedupe-chats.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "chat",
     "realtime",
     "socket.io",
-    "express",
-    "mongodb"
+    "react",
+    "frontend"
   ],
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@sendgrid/mail": "^8.1.5",
-    "bcryptjs": "^3.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.1",
-    "multer": "^1.4.5-lts.1",
-    "socket.io": "^4.8.1"
+    "@tailwindcss/vite": "^4.1.13",
+    "framer-motion": "^12.23.22",
+    "lucide-react": "^0.544.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "socket.io-client": "^4.8.1",
+    "tailwindcss": "^4.1.13"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/node": "^22.7.4",
+    "@vitejs/plugin-react": "^4.3.2",
+    "vite": "^5.4.8"
   }
 }

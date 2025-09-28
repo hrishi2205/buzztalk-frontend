@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { apiRequest, uploadAvatarFile } from "../../../utils/api";
+import { apiRequest, uploadAvatarFile } from "../../utils/api";
 
 const SettingsModal = ({ currentUser, onClose, onUpdated, onAlert }) => {
   const [displayName, setDisplayName] = useState(

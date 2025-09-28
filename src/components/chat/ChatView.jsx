@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import io from "socket.io-client";
-import { apiRequest, SOCKET_URL } from "../../../utils/api";
+import { apiRequest, SOCKET_URL } from "../../utils/api";
 
 import Sidebar from "./Sidebar";
 import ChatWindow from "./ChatWindow";

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { apiRequest } from "../../../utils/api";
+import { apiRequest } from "../../utils/api";
 import {
   generateKeyPair,
   exportKey,
   decryptPrivateKeyWithPassword,
-} from "../../../utils/crypto";
+} from "../../utils/crypto";
 import Card from "../ui/Card";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
@@ -67,7 +67,7 @@ const LoginView = ({ setView, onLoginSuccess }) => {
           try {
             // Use current password to create EPK and upload
             const epk = await (
-              await import("../../../utils/crypto")
+              await import("../../utils/crypto")
             ).encryptPrivateKeyWithPassword(storedPriv, password);
             await apiRequest("users/private-key", "POST", epk, userData.token);
             userData.__privateKey = storedPriv;

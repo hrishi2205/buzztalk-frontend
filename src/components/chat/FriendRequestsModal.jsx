@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { apiRequest } from "../../../utils/api.js";
+import { apiRequest } from "../../utils/api.js";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 
