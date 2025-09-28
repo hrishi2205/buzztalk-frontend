@@ -1,4 +1,0 @@
-/api/* https://server.buzztalk.me/api/:splat 200
-/socket.io/* https://server.buzztalk.me/socket.io/:splat 200
-/uploads/* https://server.buzztalk.me/uploads/:splat 200
-/* /index.html 200
