@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "vite.config.js",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "framework": "vite",
+  "env": {
+    "VITE_API_URL": "https://server.buzztalk.me",
+    "VITE_SOCKET_URL": "https://server.buzztalk.me"
+  },
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://server.buzztalk.me/api/:path*"
+    },
+    {
+      "source": "/socket.io/:path*",
+      "destination": "https://server.buzztalk.me/socket.io/:path*"
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
+}
